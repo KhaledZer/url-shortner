@@ -1,0 +1,3265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>URL Shortener — Beginner Pair Build Plan</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --text: #111827;
+    --muted: #4b5563;
+    --soft: #6b7280;
+    --border: #e5e7eb;
+    --line: #d1d5db;
+
+    --dev-a: #1d4ed8;
+    --dev-a-tint: #eff6ff;
+    --dev-a-edge: #93c5fd;
+
+    --dev-b: #7c3aed;
+    --dev-b-tint: #f5f3ff;
+    --dev-b-edge: #c4b5fd;
+
+    --concept: #b45309;
+    --concept-tint: #fffbeb;
+    --concept-edge: #fcd34d;
+
+    --hint: #047857;
+    --hint-tint: #ecfdf5;
+    --hint-edge: #6ee7b7;
+
+    --git: #c2410c;
+    --git-tint: #fff7ed;
+    --git-edge: #fdba74;
+
+    --pair: #0e7490;
+    --pair-tint: #ecfeff;
+    --pair-edge: #67e8f9;
+
+    --warn: #b91c1c;
+    --warn-tint: #fef2f2;
+    --warn-edge: #fca5a5;
+
+    --stretch: #6d28d9;
+    --stretch-tint: #faf5ff;
+    --stretch-edge: #ddd6fe;
+
+    --check: #059669;
+    --check-tint: #ecfdf5;
+    --check-edge: #6ee7b7;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 1.25rem 5rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5 { line-height: 1.25; }
+  h1 { font-size: 2.25rem; margin: 0 0 .5rem; }
+  h2 { font-size: 1.6rem; margin: 0; }
+  h3 { font-size: 1.15rem; margin: 1.5rem 0 .5rem; }
+  h4 { font-size: 1rem; margin: 0 0 .5rem; }
+  h5 { font-size: .85rem; margin: 0 0 .4rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  p { margin: .5rem 0; }
+  ul, ol { margin: .5rem 0 .5rem 1.25rem; padding: 0; }
+  li { margin: .25rem 0; }
+  a { color: var(--dev-a); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── STICKY OVERALL PROGRESS ── */
+  .overall {
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: saturate(180%) blur(6px);
+    -webkit-backdrop-filter: saturate(180%) blur(6px);
+    border-bottom: 1px solid var(--border);
+    padding: .65rem 1rem;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0 -1.25rem 1.5rem;
+  }
+  .overall-label {
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    min-width: 9em;
+  }
+  .overall-bar {
+    flex: 1;
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .overall-fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #10b981, #059669);
+    width: 0;
+    transition: width .35s ease;
+  }
+  .overall-text {
+    font-size: .85rem;
+    font-weight: 700;
+    color: #065f46;
+    min-width: 7em;
+    text-align: right;
+  }
+  .overall-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: .3rem .65rem;
+    border-radius: 6px;
+    font-size: .75rem;
+    cursor: pointer;
+  }
+  .overall-reset:hover { background: #fef2f2; color: var(--warn); border-color: var(--warn-edge); }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #312e81 100%);
+    color: #f8fafc;
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
+    margin: 1rem 0 1.5rem;
+    box-shadow: 0 12px 32px -16px rgba(15, 23, 42, 0.45);
+  }
+  .hero h1 { color: #fff; }
+  .hero p { color: #cbd5e1; max-width: 70ch; }
+  .hero .tagline {
+    display: inline-block;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #e2e8f0;
+    padding: .35rem .75rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    margin-bottom: 1rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .hero .meta {
+    display: flex; flex-wrap: wrap; gap: 1rem;
+    margin-top: 1.25rem; color: #cbd5e1; font-size: .9rem;
+  }
+  .hero .meta strong { color: #fff; }
+
+  /* ── ROLE CARDS ── */
+  .roles {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1rem; margin: 1.5rem 0;
+  }
+  .role-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    border-top: 4px solid;
+  }
+  .role-card.dev-a { border-top-color: var(--dev-a); }
+  .role-card.dev-b { border-top-color: var(--dev-b); }
+  .role-card h3 { margin: 0 0 .5rem; font-size: 1.1rem; }
+  .role-card.dev-a h3 { color: var(--dev-a); }
+  .role-card.dev-b h3 { color: var(--dev-b); }
+  .role-card .stack {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .82rem; color: var(--muted); margin-top: .25rem;
+  }
+  .role-card .split {
+    margin-top: .75rem;
+    padding-top: .75rem;
+    border-top: 1px dashed var(--border);
+    font-size: .9rem;
+  }
+  .role-card .split strong { display: block; color: var(--text); margin-bottom: .15rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .toc h3 { margin-top: 0; }
+  .toc ol { columns: 2; column-gap: 2rem; margin: 0; padding-left: 1.25rem; }
+  .toc li { break-inside: avoid; }
+
+  /* ── PHASE ── */
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .phase-header {
+    display: flex; align-items: baseline; gap: .75rem;
+    flex-wrap: wrap;
+    padding-bottom: .75rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .phase-header h2 { flex: 1 1 100%; margin-top: .35rem; }
+  .phase-meta { color: var(--muted); font-size: .9rem; flex: 1 1 100%; }
+
+  .badge {
+    display: inline-block;
+    padding: .25rem .6rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    border: 1px solid;
+  }
+  .badge.phase-badge { background: #1f2937; color: #fff; border-color: #1f2937; }
+  .badge.dev-a { background: var(--dev-a-tint); color: var(--dev-a); border-color: var(--dev-a-edge); }
+  .badge.dev-b { background: var(--dev-b-tint); color: var(--dev-b); border-color: var(--dev-b-edge); }
+  .badge.both  { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+  .badge.be    { background: #e0e7ff; color: #3730a3; border-color: #a5b4fc; }
+  .badge.fe    { background: #fce7f3; color: #9f1239; border-color: #f9a8d4; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-left: 4px solid;
+    background: var(--surface);
+    padding: 1rem 1.15rem;
+    border-radius: 0 10px 10px 0;
+    margin: 1rem 0;
+  }
+  .callout h4 { display: flex; align-items: center; gap: .5rem; margin: 0 0 .5rem; }
+  .callout h4::before {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .68rem;
+    padding: .15rem .45rem;
+    border-radius: 4px;
+  }
+  .callout p:last-child, .callout ul:last-child { margin-bottom: 0; }
+
+  .callout.concept { border-color: var(--concept); background: var(--concept-tint); }
+  .callout.concept h4::before { content: "CONCEPT"; background: var(--concept); color: #fff; }
+  .callout.hint    { border-color: var(--hint);    background: var(--hint-tint); }
+  .callout.hint    h4::before { content: "HINT"; background: var(--hint); color: #fff; }
+  .callout.git     { border-color: var(--git);     background: var(--git-tint); }
+  .callout.git     h4::before { content: "GIT"; background: var(--git); color: #fff; }
+  .callout.pair    { border-color: var(--pair);    background: var(--pair-tint); }
+  .callout.pair    h4::before { content: "PAIR"; background: var(--pair); color: #fff; }
+  .callout.warn    { border-color: var(--warn);    background: var(--warn-tint); }
+  .callout.warn    h4::before { content: "GOTCHA"; background: var(--warn); color: #fff; }
+  .callout.stretch { border-color: var(--stretch); background: var(--stretch-tint); }
+  .callout.stretch h4::before { content: "STRETCH"; background: var(--stretch); color: #fff; }
+
+  /* ── TRACKS ── */
+  .tracks {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1rem; margin: 1rem 0;
+  }
+  .track {
+    border: 1.5px solid;
+    border-radius: 10px;
+    padding: 1.1rem 1.2rem;
+    background: var(--surface);
+  }
+  .track.dev-a { border-color: var(--dev-a-edge); background: var(--dev-a-tint); }
+  .track.dev-b { border-color: var(--dev-b-edge); background: var(--dev-b-tint); }
+  .track h4 { margin-top: 0; font-size: .95rem; }
+  .track .stack-tag {
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .7rem;
+    padding: .1rem .4rem;
+    background: rgba(255,255,255,.6);
+    border-radius: 4px;
+    margin-left: .35rem;
+  }
+  .track ul { margin-left: 1rem; }
+
+  /* ── CHECKPOINTS (interactive) ── */
+  .checkpoints {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 2px solid var(--check-edge);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+  }
+  .checkpoints h4 {
+    margin-top: 0;
+    color: #064e3b;
+    display: flex; align-items: center; gap: .5rem;
+    font-size: 1.05rem;
+  }
+  .checkpoint-intro {
+    font-size: .88rem;
+    color: #065f46;
+    margin: 0 0 .85rem;
+  }
+  .checkpoint-group {
+    background: rgba(255,255,255,0.72);
+    border-radius: 10px;
+    padding: .85rem 1rem;
+    margin: .55rem 0;
+    border-left: 3px solid #d1d5db;
+  }
+  .checkpoint-group h5 { color: #4b5563; }
+  .checkpoint-group.both     { border-left-color: #f59e0b; }
+  .checkpoint-group.both h5  { color: #92400e; }
+  .checkpoint-group.dev-a    { border-left-color: var(--dev-a); }
+  .checkpoint-group.dev-a h5 { color: var(--dev-a); }
+  .checkpoint-group.dev-b    { border-left-color: var(--dev-b); }
+  .checkpoint-group.dev-b h5 { color: var(--dev-b); }
+  .checkpoint-group.concept-check    { border-left-color: var(--concept); }
+  .checkpoint-group.concept-check h5 { color: var(--concept); }
+  .checkpoint-group.verify    { border-left-color: var(--pair); }
+  .checkpoint-group.verify h5 { color: var(--pair); }
+
+  ul.task-list { list-style: none; padding-left: 0; margin: 0; }
+  ul.task-list li {
+    padding: .4rem .6rem;
+    margin: .25rem 0;
+    background: rgba(255,255,255,0.7);
+    border-radius: 6px;
+    transition: background .2s, opacity .2s;
+    border: 1px solid transparent;
+  }
+  ul.task-list li.completed {
+    background: rgba(167,243,208,0.55);
+    border-color: rgba(110, 231, 183, .5);
+  }
+  ul.task-list li.completed span { text-decoration: line-through; color: #6b7280; }
+  ul.task-list label {
+    display: flex; align-items: flex-start; gap: .55rem;
+    cursor: pointer; font-size: .92rem;
+  }
+  ul.task-list input[type="checkbox"] {
+    flex-shrink: 0;
+    margin-top: .2rem;
+    cursor: pointer;
+    width: 1.05rem; height: 1.05rem;
+    accent-color: #059669;
+  }
+
+  .progress-bar {
+    position: relative;
+    height: 24px;
+    background: rgba(255,255,255,0.65);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: .85rem;
+    border: 1px solid #a7f3d0;
+  }
+  .progress-fill {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, #10b981, #059669);
+    width: 0;
+    transition: width .3s;
+  }
+  .progress-text {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    height: 100%; font-size: .82rem; font-weight: 700;
+    color: #064e3b; z-index: 1;
+  }
+
+  /* ── TYPOGRAPHY HELPERS ── */
+  .term {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #eef2ff;
+    color: #3730a3;
+    padding: .1rem .4rem;
+    border-radius: 4px;
+    font-size: .9em;
+  }
+  .kbd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #1f2937;
+    color: #f9fafb;
+    padding: .1rem .45rem;
+    border-radius: 4px;
+    font-size: .85em;
+  }
+
+  /* ── APPENDIX ── */
+  .appendix {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .appendix h2 { margin-bottom: 1rem; }
+  .appendix table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .appendix th, .appendix td {
+    text-align: left; padding: .55rem .65rem;
+    border-bottom: 1px solid var(--border); vertical-align: top;
+  }
+  .appendix th {
+    background: #f3f4f6; font-size: .82rem;
+    text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+  }
+  .glossary dt { font-weight: 700; color: var(--text); margin-top: .9rem; }
+  .glossary dd { margin: .1rem 0 0; color: var(--muted); }
+
+  /* ── FLOW STRIP ── */
+  .flow {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: .5rem; margin: 1rem 0; padding: 1rem;
+    background: #f9fafb; border: 1px dashed var(--border);
+    border-radius: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .85rem; color: var(--muted);
+  }
+  .flow .node {
+    background: #fff; border: 1px solid var(--line);
+    padding: .35rem .6rem; border-radius: 6px; color: var(--text);
+  }
+  .flow .arrow { color: var(--soft); }
+
+  /* ── RESPONSIBILITY TABLE ── */
+  .resp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+    margin: 1rem 0;
+  }
+  .resp-table th, .resp-table td {
+    border: 1px solid var(--border);
+    padding: .55rem .7rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .resp-table th { background: #f3f4f6; }
+  .resp-table td.dev-a-cell { background: var(--dev-a-tint); }
+  .resp-table td.dev-b-cell { background: var(--dev-b-tint); }
+  .resp-table td.both-cell  { background: #fef3c7; }
+  .resp-table .be { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; color: #3730a3; }
+  .resp-table .fe { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; color: #9f1239; }
+
+  footer {
+    text-align: center; color: var(--soft); font-size: .85rem;
+    margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 760px) {
+    .roles, .tracks { grid-template-columns: 1fr; }
+    .toc ol { columns: 1; }
+    h1 { font-size: 1.7rem; }
+    .overall { flex-wrap: wrap; }
+    .overall-label { min-width: 100%; }
+  }
+
+  @media print {
+    .overall { display: none; }
+    body { background: #fff; padding: 0; max-width: 100%; }
+    .hero, .phase, .appendix, .toc { box-shadow: none; border: 1px solid #ccc; }
+    .phase { break-inside: avoid; }
+    a { color: #000; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── STICKY PROGRESS ── -->
+<div class="overall" id="overall-progress">
+  <span class="overall-label">Overall progress</span>
+  <div class="overall-bar"><div class="overall-fill"></div></div>
+  <span class="overall-text">0 / 0 · 0%</span>
+  <button class="overall-reset" type="button" onclick="resetProgress()">Reset</button>
+</div>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <span class="tagline">Beginner Pair Build · From Zero → Deployed</span>
+  <h1>URL Shortener — A Two-Developer Build Plan</h1>
+  <p>
+    A 13-phase, step-by-step roadmap for two beginner developers to ship the
+    URL shortener from the design. <strong>Both developers write backend AND
+    frontend code</strong>. Each owns a feature that spans the whole stack, so
+    by the end you'll have both built REST endpoints in NestJS and React pages
+    in Next.js. Tasks at the end of every phase tick off as you go and persist
+    in your browser.
+  </p>
+  <div class="meta">
+    <span><strong>Pace:</strong> ~8–10 weeks part-time</span>
+    <span><strong>Prerequisites:</strong> none — really</span>
+    <span><strong>Output:</strong> a deployed app, a portfolio repo, a real teammate</span>
+  </div>
+</header>
+
+<!-- ── OVERVIEW ── -->
+<section class="appendix" id="overview">
+  <h2>What you are building &amp; how the work splits</h2>
+  <p>
+    A user pastes a long URL → the system returns a short one. When anyone
+    visits that short URL → the system redirects them. Click counts power a
+    small dashboard. You'll build it in 13 phases, growing into the design as
+    your skills grow.
+  </p>
+
+  <div class="flow">
+    <span class="node">User</span><span class="arrow">─POST─▶</span>
+    <span class="node">Next.js</span><span class="arrow">─POST─▶</span>
+    <span class="node">NestJS API</span><span class="arrow">─INSERT─▶</span>
+    <span class="node">Postgres</span>
+  </div>
+  <div class="flow">
+    <span class="node">Anyone</span><span class="arrow">─GET /slug─▶</span>
+    <span class="node">NestJS API</span><span class="arrow">─lookup─▶</span>
+    <span class="node">Cache → DB</span><span class="arrow">─302─▶</span>
+    <span class="node">Original URL</span>
+  </div>
+
+  <h3>The two developers, and how each touches both stacks</h3>
+  <div class="roles">
+    <div class="role-card dev-a">
+      <h3>Dev A — owns "Create &amp; Curate"</h3>
+      <div class="stack">NestJS · TypeScript · Prisma · Postgres · Next.js · React · Tailwind</div>
+      <div class="split">
+        <strong>Backend work</strong>
+        Designs and writes <span class="term">POST /links</span>, <span class="term">GET /links</span>, the <span class="term">CreateLinkDto</span> with validation, the <span class="term">Link</span> Prisma model, and the slug generator.
+      </div>
+      <div class="split">
+        <strong>Frontend work</strong>
+        Owns the <span class="term">/not-found</span> page and the <span class="term">/dashboard</span> page (table of all links + click counts). Pairs on the success view in Phase 6.
+      </div>
+    </div>
+    <div class="role-card dev-b">
+      <h3>Dev B — owns "Use &amp; Measure"</h3>
+      <div class="stack">NestJS · TypeScript · Prisma · Redis · Next.js · React · Tailwind</div>
+      <div class="split">
+        <strong>Backend work</strong>
+        Designs and writes <span class="term">GET /:slug</span> with redirect, wires Redis cache-aside, writes click tracking, and the <span class="term">GET /links/:slug/stats</span> endpoint.
+      </div>
+      <div class="split">
+        <strong>Frontend work</strong>
+        Owns the home-page <span class="term">CreateLinkForm</span> and success view (copy button, animations) and the dynamic <span class="term">/links/[slug]</span> stats page.
+      </div>
+    </div>
+  </div>
+
+  <h3>Backend vs Frontend per phase — at a glance</h3>
+  <table class="resp-table">
+    <thead>
+      <tr><th>Phase</th><th>Dev A does</th><th>Dev B does</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>0. Foundations</td><td class="both-cell">Tools, accounts, repos, Git basics</td><td class="both-cell">Tools, accounts, repos, Git basics</td></tr>
+      <tr><td>1. Read the Map</td><td class="both-cell">Trace flows, write API contract</td><td class="both-cell">Trace flows, write API contract</td></tr>
+      <tr><td>2. Scaffold</td><td class="dev-a-cell"><span class="be">be</span> Scaffold NestJS</td><td class="dev-b-cell"><span class="fe">fe</span> Scaffold Next.js</td></tr>
+      <tr><td>3. Hello, Stack</td><td class="dev-a-cell"><span class="be">be</span> Health endpoint + <span class="fe">fe</span> About page</td><td class="dev-b-cell"><span class="fe">fe</span> Home layout + <span class="be">be</span> Version endpoint</td></tr>
+      <tr><td>4. Handshake</td><td class="both-cell">Pair on CORS + integration</td><td class="both-cell">Pair on CORS + integration</td></tr>
+      <tr><td>5. Database</td><td class="both-cell">Pair on Postgres + Prisma setup</td><td class="both-cell">Pair on Postgres + Prisma setup</td></tr>
+      <tr><td>6. Create flow</td><td class="dev-a-cell"><span class="be">be</span> POST /links</td><td class="dev-b-cell"><span class="fe">fe</span> Form + success view</td></tr>
+      <tr><td>7. Redirect flow</td><td class="dev-a-cell"><span class="fe">fe</span> not-found page + success enhancements</td><td class="dev-b-cell"><span class="be">be</span> GET /:slug + 302</td></tr>
+      <tr><td>8. Caching</td><td class="dev-a-cell"><span class="fe">fe</span> Dashboard layout</td><td class="dev-b-cell"><span class="be">be</span> Redis cache-aside</td></tr>
+      <tr><td>9. Analytics</td><td class="dev-a-cell"><span class="be">be</span> GET /links + <span class="fe">fe</span> dashboard data</td><td class="dev-b-cell"><span class="be">be</span> Click tracking, stats + <span class="fe">fe</span> /links/[slug]</td></tr>
+      <tr><td>10. Robustness</td><td class="both-cell">Tests for own endpoints + E2E + CI</td><td class="both-cell">Tests for own endpoints + E2E + CI</td></tr>
+      <tr><td>11. Deploy</td><td class="dev-a-cell">Deploy backend to Railway/Render</td><td class="dev-b-cell">Deploy frontend to Vercel</td></tr>
+      <tr><td>12. Retro</td><td class="both-cell">Reflect, plan V2</td><td class="both-cell">Reflect, plan V2</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout pair">
+    <h4>How the checkpoints work</h4>
+    <p>
+      Every phase ends with a <strong>Checkpoints</strong> block of small,
+      concrete tasks grouped by owner (Both / Dev A / Dev B), plus
+      concept-understanding checks and "verify it works" checks. Click each
+      checkbox when complete. <strong>Your progress is saved in your browser's
+      localStorage</strong> — close the tab, come back tomorrow, your ticks are
+      still there. The sticky bar at the top shows overall progress. Hit
+      "Reset" at the top to clear everything if you start over.
+    </p>
+  </div>
+
+  <div class="callout warn">
+    <h4>Mindset before you start</h4>
+    <ul>
+      <li>Confusion is the work. Sitting with something unclear, then breaking it down — that's the skill you're training.</li>
+      <li>Read error messages out loud. Most have the answer inside them.</li>
+      <li>If you've been stuck for more than 30 minutes, ask. Either each other, or in writing in your GitHub Issues. Don't grind alone.</li>
+      <li>Small commits. Small PRs. You can always rebase later — you cannot un-tangle a 3,000-line PR.</li>
+      <li><strong>Don't paste from AI without reading.</strong> The whole point is to build the wiring in your own head. Hints over answers.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── TOC ── -->
+<nav class="toc">
+  <h3>Phases</h3>
+  <ol>
+    <li><a href="#phase-0">Foundations — tools, accounts, first commit</a></li>
+    <li><a href="#phase-1">Read the Map — understand the design</a></li>
+    <li><a href="#phase-2">Scaffold — both apps live</a></li>
+    <li><a href="#phase-3">Hello, Stack — first endpoint &amp; first page (you do both)</a></li>
+    <li><a href="#phase-4">The Handshake — frontend talks to backend</a></li>
+    <li><a href="#phase-5">Memory — the database</a></li>
+    <li><a href="#phase-6">Shorten a Link — the create flow</a></li>
+    <li><a href="#phase-7">Use a Link — the redirect flow</a></li>
+    <li><a href="#phase-8">Speed — caching</a></li>
+    <li><a href="#phase-9">Insights — analytics &amp; dashboard</a></li>
+    <li><a href="#phase-10">Robustness — errors, tests, CI</a></li>
+    <li><a href="#phase-11">Ship It — deployment</a></li>
+    <li><a href="#phase-12">Retrospective — and what's next</a></li>
+  </ol>
+</nav>
+
+<!-- ═══════════════════════════ PHASES INSERTED BELOW ═══════════════════════ -->
+
+<!-- ════════════════════════════════ PHASE 0 ════════════════════════════════ -->
+<section class="phase" id="phase-0">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 0</span>
+    <span class="badge both">Both Devs · Pair</span>
+    <h2>Foundations — Tools, Accounts, First Commit</h2>
+    <p class="phase-meta">Goal: both machines are ready. Both names appear in the same Git history. You've made a commit, pushed it, and pulled the other person's.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    Before any project code, you need the rails everything else runs on:
+    Node.js, a package manager, an editor, Git, GitHub, and the muscle memory
+    of making a commit. Take this phase slowly. Most pair projects silently
+    fail in week three because someone's on a different Node version or never
+    set up SSH keys.
+  </p>
+
+  <div class="callout concept">
+    <h4>What is Node.js?</h4>
+    <p>
+      A browser runs JavaScript. Node.js lets you run JavaScript anywhere else
+      — on your laptop, on a server. Both NestJS and Next.js are programs that
+      run on Node.js. Install the version labelled <strong>LTS</strong>
+      (Long-Term Support) and confirm you both have the same major version
+      (the number before the first dot).
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a package manager?</h4>
+    <p>
+      Your project will pull in hundreds of small libraries written by other
+      people. A package manager downloads them, records exact versions in a
+      <span class="term">package.json</span>, and locks them so the next dev
+      gets the same set. <span class="term">npm</span> ships with Node.js;
+      <span class="term">pnpm</span> is faster and more disk-friendly. Pick
+      one. Stay consistent.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is <span class="term">package.json</span>? What's a lockfile?</h4>
+    <p>
+      <span class="term">package.json</span> is your project's name card: the
+      project name, scripts you can run (<span class="term">npm run dev</span>,
+      <span class="term">npm run build</span>), and the libraries you depend
+      on with version ranges. The <strong>lockfile</strong>
+      (<span class="term">package-lock.json</span> or
+      <span class="term">pnpm-lock.yaml</span>) records the <em>exact</em>
+      version of every direct AND indirect dependency, so installs are
+      reproducible. Both files are committed to Git. Never hand-edit the
+      lockfile.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Library vs Framework — what's the difference?</h4>
+    <p>
+      A <strong>library</strong> is code you call from your code (you're in
+      charge). A <strong>framework</strong> calls your code at the right times
+      (it's in charge — "Hollywood principle: don't call us, we'll call you").
+      React is mostly a library. NestJS is a framework. Next.js is a framework.
+      Frameworks give beginners structure; libraries give you flexibility.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is Git?</h4>
+    <p>
+      A time machine for your code. Every "commit" is a snapshot with a
+      message. You can rewind, branch off into experiments, and merge back.
+      It works locally — no internet required — until you sync with a remote.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is GitHub?</h4>
+    <p>
+      A website that hosts Git repositories and adds collaboration features:
+      pull requests, code review, issues, automated checks. Git is the tool.
+      GitHub is one place that uses it. (GitLab and Bitbucket are alternatives.)
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Four Git words — repository, commit, branch, remote</h4>
+    <ul>
+      <li><strong>Repository (repo):</strong> a folder Git is tracking.</li>
+      <li><strong>Commit:</strong> a saved snapshot + a message.</li>
+      <li><strong>Branch:</strong> a parallel line of commits. <span class="term">main</span> is the default.</li>
+      <li><strong>Remote:</strong> a copy of the repo somewhere else. <span class="term">origin</span> is the default name for "the one on GitHub."</li>
+    </ul>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-a">
+      <h4>Dev A — Setup &amp; the API repo</h4>
+      <ul>
+        <li>Install Node.js LTS. Verify with <span class="kbd">node -v</span>.</li>
+        <li>Install pnpm (or stick with npm) and verify the version.</li>
+        <li>Install VS Code (or the editor of your choice).</li>
+        <li>Install Git. Run <span class="kbd">git config --global user.name</span> and <span class="kbd">user.email</span> so commits are attributed to you.</li>
+        <li>Create a GitHub account if you need one. Add an SSH key (search "GitHub SSH key setup").</li>
+        <li>Create the repo <span class="term">url-shortener-api</span>. Add Dev B as a collaborator. Initialize it with a README and a Node-flavored <span class="term">.gitignore</span>.</li>
+      </ul>
+    </div>
+    <div class="track dev-b">
+      <h4>Dev B — Setup &amp; the Web repo</h4>
+      <ul>
+        <li>Install Node.js LTS — <strong>same major version</strong> as Dev A.</li>
+        <li>Install pnpm (or npm) — match Dev A.</li>
+        <li>Install VS Code or your editor.</li>
+        <li>Install Git. Configure user.name and user.email.</li>
+        <li>Create a GitHub account if needed. Add an SSH key.</li>
+        <li>Create the repo <span class="term">url-shortener-web</span>. Add Dev A as collaborator. README + Node <span class="term">.gitignore</span>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout pair">
+    <h4>First pair session — sit together or share a screen</h4>
+    <ol>
+      <li>Both clone <em>both</em> repos.</li>
+      <li>Write a one-paragraph README in each repo: what the project is, who you both are, which stack lives there.</li>
+      <li>Each dev pushes a commit to their own repo.</li>
+      <li>Each dev pushes a second commit to the <em>other</em> dev's repo (a typo fix in the README is enough). Goal: both names appear in both histories on day one.</li>
+    </ol>
+  </div>
+
+  <div class="callout git">
+    <h4>Your starter Git vocabulary</h4>
+    <ul>
+      <li><span class="kbd">git status</span> — your best friend; ask it constantly.</li>
+      <li><span class="kbd">git add &lt;file&gt;</span> — stages a change for the next commit.</li>
+      <li><span class="kbd">git commit -m "..."</span> — saves a snapshot.</li>
+      <li><span class="kbd">git push</span> — sends commits to GitHub.</li>
+      <li><span class="kbd">git pull</span> — fetches and merges from GitHub.</li>
+    </ul>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Use a curated <span class="term">.gitignore</span> template — search "Node gitignore template" and copy the standard one. It'll save you committing 80,000 <span class="term">node_modules</span> files.</li>
+      <li>Make your first commit tiny so you feel the whole cycle: edit → save → <span class="kbd">add</span> → <span class="kbd">commit</span> → <span class="kbd">push</span> → refresh GitHub → see it.</li>
+      <li>If a Git command outputs more than three lines, read all of them. Git is unusually clear about what to do next.</li>
+      <li>SSH key setup is annoying once. Worth it. Don't skip it for HTTPS — you'll thank yourself in Phase 11.</li>
+    </ul>
+  </div>
+
+  <div class="callout warn">
+    <h4>Common day-one traps</h4>
+    <ul>
+      <li>Mismatched Node versions silently break things in week 3. Verify with <span class="kbd">node -v</span>.</li>
+      <li>Committing <span class="term">node_modules</span>. Use a <span class="term">.gitignore</span> before your first <span class="kbd">npm install</span>.</li>
+      <li>Two people pushing to <span class="term">main</span> simultaneously. Branches start in Phase 2.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 0 Checkpoints</h4>
+    <p class="checkpoint-intro">Tick each item only when both of you agree it's truly done. Blocked? Open a GitHub Issue with the blocker.</p>
+
+    <div class="checkpoint-group both">
+      <h5>Setup &amp; tooling</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p0-1"><span>Both devs have Node.js LTS installed (<span class="kbd">node -v</span> matches major version)</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-2"><span>Both devs have the same package manager (npm or pnpm) installed</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-3"><span>Both devs have an editor installed (VS Code or similar)</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-4"><span>Both devs have Git installed and configured (<span class="kbd">user.name</span> and <span class="kbd">user.email</span>)</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-5"><span>Both devs have a GitHub account with an SSH key added</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — API repo</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p0-a1"><span>Created the <span class="term">url-shortener-api</span> repo on GitHub</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-a2"><span>Added Dev B as a collaborator</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-a3"><span>Cloned the repo locally and can open it in your editor</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-a4"><span>Wrote a README and a Node-flavored <span class="term">.gitignore</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p0-a5"><span>Pushed at least one commit to <span class="term">url-shortener-api</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p0-a6"><span>Pushed a tiny commit (typo fix) to <span class="term">url-shortener-web</span> so your name appears there too</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — Web repo</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p0-b1"><span>Created the <span class="term">url-shortener-web</span> repo on GitHub</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-b2"><span>Added Dev A as a collaborator</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-b3"><span>Cloned the repo locally and can open it in your editor</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-b4"><span>Wrote a README and a Node-flavored <span class="term">.gitignore</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p0-b5"><span>Pushed at least one commit to <span class="term">url-shortener-web</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p0-b6"><span>Pushed a tiny commit (typo fix) to <span class="term">url-shortener-api</span></span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p0-c1"><span>What Node.js is and why we need it</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-c2"><span>What a package manager does</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-c3"><span>What a lockfile is and why you don't hand-edit it</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-c4"><span>The difference between a library and a framework</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-c5"><span>The difference between staging (<span class="kbd">add</span>), committing, and pushing</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p0-v1"><span>You can both run <span class="kbd">git clone</span> on each other's repo without errors</span></label></li>
+        <li><label><input type="checkbox" data-key="p0-v2"><span>Both repos show commits from both authors in their history</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 1 ════════════════════════════════ -->
+<section class="phase" id="phase-1">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 1</span>
+    <span class="badge both">Both Devs · Pair</span>
+    <h2>Read the Map — Understand the Design</h2>
+    <p class="phase-meta">Goal: both devs can narrate every flow without notes and have written down the API contract together.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    Code is downstream of understanding. Sit with the Excalidraw design,
+    finger-trace each path, and write down what you see. If you can't tell
+    the story aloud, you're not ready to build it.
+  </p>
+
+  <div class="callout concept">
+    <h4>Client and server</h4>
+    <p>
+      The <strong>client</strong> asks. The <strong>server</strong> answers.
+      Your browser is the client; your NestJS process is the server. The labels
+      are about direction, not location.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is an API?</h4>
+    <p>
+      A contract: "send me a request shaped like this, I'll send you a response
+      shaped like that." For this project the API is the set of URLs your
+      NestJS backend answers. Your Next.js frontend is one client of it; curl
+      and Postman are other clients.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>HTTP — the language of the web</h4>
+    <p>
+      Every HTTP request has four parts: a <strong>method</strong>
+      (<span class="term">GET</span>, <span class="term">POST</span>…), a
+      <strong>URL</strong>, <strong>headers</strong> (metadata: who you are,
+      what you accept), and an optional <strong>body</strong>. The response
+      has a <strong>status code</strong>, headers, and a body.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>HTTP methods — the verbs</h4>
+    <ul>
+      <li><span class="term">GET</span> — "give me something." No body. Safe to repeat.</li>
+      <li><span class="term">POST</span> — "create something new." Has a body. Not safe to blindly repeat.</li>
+      <li><span class="term">PUT</span> / <span class="term">PATCH</span> — "update."</li>
+      <li><span class="term">DELETE</span> — "remove."</li>
+    </ul>
+  </div>
+
+  <div class="callout concept">
+    <h4>Status codes — the answer's mood</h4>
+    <ul>
+      <li><strong>2xx</strong> — success (200 OK, 201 Created).</li>
+      <li><strong>3xx</strong> — redirect (301 permanent, 302 temporary).</li>
+      <li><strong>4xx</strong> — you messed up (400 Bad Request, 404 Not Found).</li>
+      <li><strong>5xx</strong> — the server messed up.</li>
+    </ul>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is REST?</h4>
+    <p>
+      An informal style for designing APIs where each URL points to a
+      <em>resource</em> (a thing — a link, a user, a click event) and HTTP
+      methods express what you're doing to it. <span class="term">GET /links</span>
+      lists links; <span class="term">POST /links</span> creates one. You're
+      building a REST-ish API in this project.
+    </p>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair exercise — paper before code</h4>
+    <p>Open the Excalidraw diagram and a blank document. Together, write:</p>
+    <ol>
+      <li><strong>API contract.</strong> One row per endpoint: method, path, purpose, request body, response shape, status codes. Example: <span class="term">POST /links — create a short link · body: { originalUrl } · 201 returns { slug, originalUrl, createdAt }</span>.</li>
+      <li><strong>Page list.</strong> One row per frontend page: route, purpose, what data it needs.</li>
+      <li><strong>Happy path narratives.</strong> "Create a link" and "Use a link" in plain English, naming every hop.</li>
+      <li><strong>Ownership table.</strong> For each endpoint and each page, write the owner: A or B. Use the table in the Overview as a starting point and customise.</li>
+    </ol>
+    <p>Commit this document to both repos under <span class="term">docs/api.md</span>.</p>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Open the Network tab in your browser on a site you use every day. Watch real HTTP requests flow. Names of headers will start to look familiar.</li>
+      <li>Don't try to design auth, admin permissions, custom domains, or expiring links yet. V1 endpoints number three or four total.</li>
+      <li>If you struggle to narrate a flow, draw stick figures and arrows on paper. Engineers do this on real whiteboards every day.</li>
+      <li>Names are hard. Argue about them now, before writing code, not after.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 1 Checkpoints</h4>
+    <p class="checkpoint-intro">No code yet. These are reading and writing tasks. They are the most important phase.</p>
+
+    <div class="checkpoint-group both">
+      <h5>Read &amp; write together</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p1-1"><span>Opened the Excalidraw file and zoomed through it as a pair</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-2"><span>Listed every API endpoint with method, path, and purpose</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-3"><span>Specified request body shape for endpoints that take a body</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-4"><span>Specified response shape and possible status codes for every endpoint</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-5"><span>Listed every frontend page with route and required data</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-6"><span>Wrote ownership table (A vs B) for endpoints and pages</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-7"><span>Committed <span class="term">docs/api.md</span> to <span class="term">url-shortener-api</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p1-8"><span>Committed <span class="term">docs/api.md</span> to <span class="term">url-shortener-web</span></span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p1-c1"><span>What an API is (in one sentence, to a non-coder)</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-c2"><span>The four parts of an HTTP request</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-c3"><span>The differences between GET, POST, PUT/PATCH, DELETE</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-c4"><span>What 200, 201, 301, 302, 400, 404, 500 mean</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-c5"><span>What REST is, loosely</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify you've understood</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p1-v1"><span>Dev A can narrate the "create a link" flow without looking at the diagram</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-v2"><span>Dev B can narrate the "use a link" flow without looking at the diagram</span></label></li>
+        <li><label><input type="checkbox" data-key="p1-v3"><span>Both can name every endpoint and what it returns</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 2 ════════════════════════════════ -->
+<section class="phase" id="phase-2">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 2</span>
+    <span class="badge dev-a">Dev A · backend scaffold</span>
+    <span class="badge dev-b">Dev B · frontend scaffold</span>
+    <h2>Scaffold — Both Apps Live</h2>
+    <p class="phase-meta">Goal: a running NestJS server and a running Next.js dev server. Both committed via a PR.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    "Scaffolding" means generating the project skeleton from a template so you
+    don't have to wire everything by hand. Both NestJS and Next.js ship with a
+    CLI that does this. Today you run them, push the result, and confirm the
+    apps boot. No features yet.
+  </p>
+
+  <div class="callout concept">
+    <h4>What is NestJS?</h4>
+    <p>
+      A TypeScript framework for the backend. It enforces a structure of
+      modules, controllers, and services, ships with tools for testing,
+      dependency injection, validation, and more. It runs on top of either
+      Express or Fastify under the hood — you don't usually care which.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is Next.js?</h4>
+    <p>
+      A React framework for the frontend. It adds file-based routing, server-side
+      rendering, automatic code-splitting, and a slick dev experience to plain
+      React. The current default routing system is the <strong>App Router</strong>
+      (the <span class="term">app/</span> folder). Use that — the older
+      <span class="term">pages/</span> system is legacy.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a port?</h4>
+    <p>
+      A computer runs many services at once. Ports are numbered slots —
+      <span class="term">:3000</span>, <span class="term">:5432</span> — that
+      distinguish them. NestJS defaults to 3000, Next.js defaults to 3000. They
+      will fight. Change one to <span class="term">3001</span>.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is hot reload / fast refresh?</h4>
+    <p>
+      Save a file → the browser updates instantly. No restart. This is a
+      dev-mode trick both frameworks give you. Notice it. Appreciate it. Then
+      remember production builds work differently.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is ESLint? What is Prettier?</h4>
+    <p>
+      <strong>ESLint</strong> is a linter — it scans your code for likely
+      mistakes and bad patterns and warns you. <strong>Prettier</strong> is a
+      formatter — it rewrites your code in a consistent style so you stop
+      arguing about indentation. Both come pre-configured in the scaffolds.
+      Use them on save in your editor; they'll save more time than they cost.
+    </p>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-a">
+      <h4>Dev A — Scaffold NestJS <span class="stack-tag">be</span></h4>
+      <ul>
+        <li>Install the Nest CLI globally. Look it up — the binary is named <span class="term">nest</span>.</li>
+        <li>Inside <span class="term">url-shortener-api</span>, scaffold a new NestJS project into the repo root.</li>
+        <li>Change the listening port to <span class="term">3001</span> (NOT 3000 — Next.js will want 3000).</li>
+        <li>Run the dev server. Visit it. Read what the default response says.</li>
+        <li>Open a branch <span class="term">chore/initial-scaffold</span>. Commit. Push. Open a PR.</li>
+      </ul>
+    </div>
+    <div class="track dev-b">
+      <h4>Dev B — Scaffold Next.js <span class="stack-tag">fe</span></h4>
+      <ul>
+        <li>Run the Next.js scaffolding command. Pick: <em>TypeScript: yes, ESLint: yes, Tailwind: yes, App Router: yes</em>. Take defaults for the rest.</li>
+        <li>Run <span class="term">npm run dev</span>. Visit the printed URL.</li>
+        <li>Open <span class="term">app/page.tsx</span> and change the heading text. Watch hot refresh.</li>
+        <li>Branch <span class="term">chore/initial-scaffold</span>. Commit. Push. Open a PR.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout git">
+    <h4>Git Moment — Branches, PRs, and Conventional Commits</h4>
+    <p>
+      From now on, nobody pushes to <span class="term">main</span> directly.
+      Every change lives on a branch, gets a Pull Request, gets reviewed, gets
+      merged.
+    </p>
+    <ul>
+      <li><span class="kbd">git switch -c feat/something</span> creates and moves to a branch.</li>
+      <li>Push the branch: <span class="kbd">git push -u origin feat/something</span>.</li>
+      <li>On GitHub, click "Open pull request." Title is what changed; body explains <em>why</em>.</li>
+      <li>Use the merge strategy "Squash and merge" — cleanest history for beginners.</li>
+    </ul>
+    <p>
+      <strong>Conventional Commits</strong>: a small convention where every
+      commit message starts with a type, like:
+      <span class="term">feat: add health endpoint</span>,
+      <span class="term">fix: handle empty slug</span>,
+      <span class="term">chore: bump dependencies</span>,
+      <span class="term">docs: update README</span>. Adopt it from day one.
+      It makes scanning the history a joy.
+    </p>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair time — swap reviews</h4>
+    <p>
+      Dev B reviews the backend PR. Dev A reviews the frontend PR. You're not
+      expected to deeply understand the other stack — review for names,
+      README clarity, presence of <span class="term">.gitignore</span>,
+      whether the commands documented in the README actually run.
+    </p>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>The first time the framework boots, it'll print a URL. Click it. Don't change anything else first.</li>
+      <li>NestJS asks which package manager during scaffolding. Pick the one you have installed.</li>
+      <li>Next.js gives you a lot of files. Don't panic. <span class="term">app/page.tsx</span> and <span class="term">app/layout.tsx</span> are the ones you edit.</li>
+      <li>Add a "How to run locally" section to each README. Future-you will thank present-you.</li>
+      <li>Enable "Format on save" in VS Code so Prettier runs automatically.</li>
+    </ul>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Forgetting to change the NestJS port. Both servers will scramble for 3000.</li>
+      <li>Committing <span class="term">node_modules</span>. Check your <span class="term">.gitignore</span> <em>before</em> first install.</li>
+      <li>Editing the lockfile by hand. Don't.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 2 Checkpoints</h4>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — NestJS scaffold</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p2-a1"><span>Installed the Nest CLI</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a2"><span>Scaffolded NestJS into <span class="term">url-shortener-api</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a3"><span>Changed port to 3001</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a4"><span>Confirmed dev server runs (<span class="kbd">npm run start:dev</span>)</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a5"><span>Visited <span class="term">http://localhost:3001</span> and saw the default response</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a6"><span>Committed on branch <span class="term">chore/initial-scaffold</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a7"><span>Opened a PR with a clear description</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a8"><span>PR reviewed by Dev B (at least one comment asked)</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a9"><span>PR merged via "Squash and merge"</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-a10"><span>README has a "Run locally" section</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — Next.js scaffold</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p2-b1"><span>Scaffolded Next.js with TypeScript, ESLint, Tailwind, App Router</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-b2"><span>Confirmed dev server runs (<span class="kbd">npm run dev</span>)</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-b3"><span>Visited <span class="term">http://localhost:3000</span> and saw the default page</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-b4"><span>Edited <span class="term">app/page.tsx</span> and watched hot refresh update</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-b5"><span>Committed on branch <span class="term">chore/initial-scaffold</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p2-b6"><span>Opened a PR with a clear description</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-b7"><span>PR reviewed by Dev A (at least one comment asked)</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-b8"><span>PR merged via "Squash and merge"</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-b9"><span>README has a "Run locally" section</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p2-c1"><span>What NestJS gives you that plain Node doesn't</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-c2"><span>What Next.js gives you that plain React doesn't</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-c3"><span>What a port is and why two servers need different ones</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-c4"><span>What ESLint vs Prettier do, in your own words</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-c5"><span>What Conventional Commits are and why they help</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p2-v1"><span>Both servers can run at the same time on different ports</span></label></li>
+        <li><label><input type="checkbox" data-key="p2-v2"><span>Saving a file in either app refreshes the browser without a manual reload</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 3 ════════════════════════════════ -->
+<section class="phase" id="phase-3">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 3</span>
+    <span class="badge dev-a">Dev A · be + tiny fe</span>
+    <span class="badge dev-b">Dev B · fe + tiny be</span>
+    <h2>Hello, Stack — First Endpoint &amp; First Page (you do both)</h2>
+    <p class="phase-meta">Goal: each dev writes a real endpoint in the backend AND a real page in the frontend. Both stacks, both devs, this phase.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    You will each write a primary piece (your own stack) and a secondary piece
+    (the other stack). The crossover is small but real — you'll touch the
+    folder structure and feel the rhythm of the other framework so nothing
+    feels foreign later.
+  </p>
+
+  <div class="callout concept">
+    <h4>What is a controller? (NestJS)</h4>
+    <p>
+      A class that catches HTTP requests and routes them to the right handler
+      methods. You tell NestJS which URLs it cares about using
+      <strong>decorators</strong> — labels prefixed with
+      <span class="term">@</span>. <span class="term">@Controller('links')</span>
+      means "this class handles URLs under <span class="term">/links</span>";
+      <span class="term">@Get('health')</span> means "this method handles
+      <span class="term">GET /links/health</span>".
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a service? (NestJS)</h4>
+    <p>
+      A class that holds the actual business logic — generating a slug,
+      querying the DB, talking to the cache. Controllers are <em>thin</em>
+      (accept the request, call a service). Services are <em>fat</em> (do the
+      work). This separation makes both easier to test and reuse.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a module? (NestJS)</h4>
+    <p>
+      A bundle of related controllers and services declared as a unit. Your
+      app will have a <span class="term">LinksModule</span> with a controller
+      and a service inside it. Modules can import each other to share things.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a decorator?</h4>
+    <p>
+      A function call you prefix with <span class="term">@</span> that attaches
+      metadata to a class, method, or parameter. NestJS uses them everywhere:
+      <span class="term">@Controller</span>, <span class="term">@Get</span>,
+      <span class="term">@Body</span>, <span class="term">@Injectable</span>.
+      Don't worry about how they work internally — focus on reading them.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Route vs endpoint — same thing?</h4>
+    <p>
+      Close enough. A <strong>route</strong> is the path pattern
+      (<span class="term">/links/:id</span>). An <strong>endpoint</strong> is
+      the combination of method + route
+      (<span class="term">GET /links/:id</span>). People use them
+      interchangeably; pick one and roll with it.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a React component?</h4>
+    <p>
+      A function that returns JSX. Reusable. Names always start with a capital
+      letter — that's how React knows to render <em>your</em> component vs an
+      HTML tag.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What are props?</h4>
+    <p>
+      Props (short for "properties") are the inputs a component receives,
+      written like HTML attributes. <span class="term">&lt;Greeting name="Sam" /&gt;</span>
+      passes <span class="term">name</span> as a prop. Inside the component
+      function, you receive an object: <span class="term">function Greeting({ name }) { ... }</span>.
+      Props are read-only — the parent owns them.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is JSX, really?</h4>
+    <p>
+      HTML-shaped syntax that lives inside JavaScript. The browser doesn't
+      understand it directly; a build tool converts it to plain JS function
+      calls. Rules: write <span class="term">className</span> not
+      <span class="term">class</span>, close every tag, and return one root
+      element (wrap siblings in <span class="term">&lt;&gt;...&lt;/&gt;</span>).
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is TypeScript?</h4>
+    <p>
+      JavaScript with types. You annotate that <span class="term">slug</span>
+      is a string; the editor catches your mistakes before you run anything. A
+      small effort up front saves whole evenings of debugging. Both NestJS and
+      Next.js use it by default.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>The App Router file structure (Next.js)</h4>
+    <p>
+      Inside <span class="term">app/</span>, folders become URL segments. A
+      file called <span class="term">page.tsx</span> in a folder is the page
+      served at that path. <span class="term">app/page.tsx</span> is
+      <span class="term">/</span>. <span class="term">app/about/page.tsx</span>
+      is <span class="term">/about</span>. <span class="term">layout.tsx</span>
+      wraps every page in that folder.
+    </p>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-a">
+      <h4>Dev A — Primary: backend health <span class="stack-tag">be</span> · Secondary: About page <span class="stack-tag">fe</span></h4>
+      <ul>
+        <li><strong>Backend (primary):</strong> Use the Nest CLI to generate a <span class="term">links</span> module, controller, and service.</li>
+        <li>Remove the default <span class="term">GET /</span> hello route. Add a real <span class="term">GET /links/health</span> that returns <span class="term">{ status, uptime }</span>.</li>
+        <li>The controller calls a method on the service. The service is where the data is built.</li>
+        <li>Test in the browser. Test with <span class="term">curl</span>. Test with Insomnia or Postman.</li>
+        <li><strong>Frontend (secondary, small):</strong> Add an <span class="term">/about</span> page in Next.js — create <span class="term">app/about/page.tsx</span> with a one-paragraph blurb about the project. Use Tailwind classes. Pair with Dev B for 15 minutes if needed.</li>
+        <li>Branch: <span class="term">feat/health-and-about</span>.</li>
+      </ul>
+    </div>
+    <div class="track dev-b">
+      <h4>Dev B — Primary: home layout <span class="stack-tag">fe</span> · Secondary: version endpoint <span class="stack-tag">be</span></h4>
+      <ul>
+        <li><strong>Frontend (primary):</strong> Build a homepage with a heading, a short description paragraph, and a placeholder where the form will go later.</li>
+        <li>Extract a <span class="term">Header</span> component into its own file. Pass a <span class="term">title</span> prop into it and render it.</li>
+        <li>Use Tailwind utility classes for layout (centered container, spacing). Don't write custom CSS in this phase.</li>
+        <li><strong>Backend (secondary, small):</strong> Add a <span class="term">GET /version</span> endpoint that returns <span class="term">{ version: "0.1.0" }</span>. Generate a tiny <span class="term">misc</span> module or hang it off the existing one — your call. Pair with Dev A for 15 minutes if needed.</li>
+        <li>Branch: <span class="term">feat/home-and-version</span>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair exercise — see both responses</h4>
+    <p>
+      Together, open the Network tab and visit Dev A's
+      <span class="term">/links/health</span> and Dev B's homepage. Inspect
+      the request, response headers, and body of each. Notice: one is JSON,
+      one is HTML. Both are HTTP responses. Same protocol, different content.
+    </p>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li><span class="kbd">nest g resource links</span> generates a whole CRUD-ish skeleton. Read the output, delete the parts you don't need.</li>
+      <li>Why is a React component capitalized? If you write <span class="term">&lt;header /&gt;</span> with lowercase H, React renders an HTML element. With <span class="term">&lt;Header /&gt;</span>, it calls your function.</li>
+      <li>The Tailwind class list will look noisy. That's normal. Don't write your own CSS file in week one — you'll spend more time naming classes than building.</li>
+      <li>For the cross-stack secondary task, don't aim for sophistication. The point is to touch the folder structure and feel where things live.</li>
+    </ul>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Returning a string from a NestJS controller works but isn't what you want. Return an object — Nest will JSON-stringify it for you.</li>
+      <li>Forgetting to add the new module to the root <span class="term">AppModule</span>'s <span class="term">imports</span>. Nest will silently 404 the routes.</li>
+      <li>Calling your React component <span class="term">header</span> (lowercase) — it'll render as an HTML element with whatever props you pass, dropping the rest.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 3 Checkpoints</h4>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — backend health + About page</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p3-a1"><span>Generated <span class="term">links</span> module, controller, service via CLI</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-a2"><span>Removed default hello route</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-a3"><span>Added <span class="term">GET /links/health</span> that returns an object</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-a4"><span>Controller calls a service method; service builds the data</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-a5"><span>Verified the endpoint with curl AND in the browser</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-a6"><span>Created an <span class="term">/about</span> page in Next.js with a Tailwind-styled blurb</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-a7"><span>Opened PRs, got reviewed, merged via squash</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — home layout + version endpoint</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p3-b1"><span>Built a real homepage layout (heading, paragraph, form placeholder)</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-b2"><span>Extracted a <span class="term">Header</span> component to its own file</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-b3"><span>Header accepts a <span class="term">title</span> prop and renders it</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-b4"><span>Used only Tailwind utility classes (no custom CSS file)</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-b5"><span>Added <span class="term">GET /version</span> endpoint that returns <span class="term">{ version }</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p3-b6"><span>Verified <span class="term">/version</span> works in the browser</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-b7"><span>Opened PRs, got reviewed, merged via squash</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p3-c1"><span>What a NestJS controller is</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-c2"><span>What a NestJS service is and why we separate it</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-c3"><span>What a decorator is</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-c4"><span>What JSX is and one rule that differs from HTML</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-c5"><span>What React props are and why they're read-only</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-c6"><span>How a folder name in <span class="term">app/</span> becomes a URL</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p3-v1"><span>Visiting <span class="term">http://localhost:3001/links/health</span> returns JSON</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-v2"><span>Visiting <span class="term">http://localhost:3001/version</span> returns JSON</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-v3"><span>Visiting <span class="term">http://localhost:3000</span> shows your real homepage</span></label></li>
+        <li><label><input type="checkbox" data-key="p3-v4"><span>Visiting <span class="term">http://localhost:3000/about</span> shows the About page</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 4 ════════════════════════════════ -->
+<section class="phase" id="phase-4">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 4</span>
+    <span class="badge both">Pair · Both stacks</span>
+    <h2>The Handshake — Frontend Talks to Backend</h2>
+    <p class="phase-meta">Goal: the homepage shows data fetched from your backend. CORS is configured and understood. Both devs touch both repos in this phase.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    Two apps. Two ports. One must call the other. This is your first real "the
+    system fights back" moment — you'll hit a CORS error. That's good. You'll
+    learn more from this 45-minute roadblock than from a week of tutorials.
+  </p>
+
+  <div class="callout concept">
+    <h4>What is <span class="term">fetch</span>?</h4>
+    <p>
+      A function built into the browser (and modern Node) that sends an HTTP
+      request and returns a Promise. You call it with a URL, optionally a
+      method, headers, and body. Most modern HTTP code starts with
+      <span class="term">fetch</span>.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a Promise?</h4>
+    <p>
+      A value that will exist later. Network requests take time; the function
+      returns a placeholder you can attach handlers to. A Promise has three
+      states: <em>pending</em> → either <em>fulfilled</em> or
+      <em>rejected</em>. Once settled, it never changes.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is async / await?</h4>
+    <p>
+      Friendly syntax for Promises. Write <span class="term">const r = await fetch(...)</span>
+      and JavaScript pauses on that line until the Promise resolves. The
+      function containing the <span class="term">await</span> must itself be
+      marked <span class="term">async</span>. Use <span class="term">try/catch</span>
+      to handle rejections.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is JSON?</h4>
+    <p>
+      A text format for objects: keys and values wrapped in braces. It's the
+      lingua franca of APIs. Backend sends it; frontend parses it with
+      <span class="term">.json()</span>. Strings are quoted, numbers aren't,
+      no trailing commas. Note: <span class="term">.json()</span> is itself
+      async — two awaits, not one.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is CORS — and why is it yelling at you?</h4>
+    <p>
+      "Cross-Origin Resource Sharing." Your frontend lives at
+      <span class="term">localhost:3000</span>; your backend at
+      <span class="term">localhost:3001</span>. Different origins. Browsers
+      <em>refuse</em> by default to let one origin call another, for security
+      reasons. Fix: the backend must explicitly say "I accept requests from
+      that origin." NestJS exposes a single function for this.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is an environment variable?</h4>
+    <p>
+      A value loaded from outside the code — typically a <span class="term">.env</span>
+      file or the OS. Examples: database password, API URL, secret keys.
+      Secrets stay out of Git; values that differ between local and production
+      are easy to switch. In Next.js, <span class="term">NEXT_PUBLIC_*</span>
+      vars are exposed to the browser; everything else stays server-only.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Server component vs Client component (Next.js)</h4>
+    <p>
+      In the App Router, components are <em>server components</em> by default:
+      they render on the server, ship no JS to the user. If a component uses
+      state (<span class="term">useState</span>), event handlers
+      (<span class="term">onClick</span>), or browser APIs, it must be a
+      <em>client component</em>. You opt in by writing
+      <span class="term">'use client'</span> as the first line of the file.
+    </p>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-a">
+      <h4>Dev A — Backend CORS &amp; env <span class="stack-tag">be</span></h4>
+      <ul>
+        <li>Enable CORS in your NestJS app. Look up <span class="term">app.enableCors</span>.</li>
+        <li>Read the allowed origin from an env var, not a literal string. Default to <span class="term">http://localhost:3000</span> for dev.</li>
+        <li>Create a <span class="term">.env.example</span> (no real secrets) and document expected variables.</li>
+        <li>Confirm <span class="term">.env</span> is in <span class="term">.gitignore</span>.</li>
+      </ul>
+    </div>
+    <div class="track dev-b">
+      <h4>Dev B — Ping button on the frontend <span class="stack-tag">fe</span></h4>
+      <ul>
+        <li>Build a small client component with a "Ping API" button.</li>
+        <li>On click, fetch <span class="term">/links/health</span> and display the response.</li>
+        <li>Show loading and error states explicitly.</li>
+        <li>Read API base URL from <span class="term">NEXT_PUBLIC_API_URL</span>. Add a <span class="term">.env.example</span>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair time — fail then succeed, together</h4>
+    <p>
+      Do this <strong>side by side</strong>. Open the dev tools Network tab
+      <em>before</em> clicking the button. Watch the request fail with a CORS
+      error. Read the message out loud. Fix it. Click again. Celebrate when
+      "Ping API" returns the health JSON.
+    </p>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Forgetting <span class="term">'use client'</span> in a component that uses <span class="term">useState</span> — the error is loud but easy to skim past.</li>
+      <li>Only <span class="term">NEXT_PUBLIC_</span>-prefixed env vars reach the browser. Everything else is server-only by design.</li>
+      <li>Committing <span class="term">.env</span>. Never. Use <span class="term">.env.example</span> with placeholder values.</li>
+      <li>Awaiting fetch but forgetting to await <span class="term">.json()</span> — you'll log a Promise instead of the data.</li>
+    </ul>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Don't write a clever "API client" abstraction yet. A single inline <span class="term">fetch</span> is fine.</li>
+      <li>If your spinner blinks too fast to see, add a deliberate delay while developing — then remove it before merging.</li>
+      <li>If a CORS error is unclear, read it word-for-word. The browser literally states which origin it expected.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 4 Checkpoints</h4>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — backend</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p4-a1"><span>Enabled CORS in NestJS</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-a2"><span>Allowed origin is loaded from an env var (not hardcoded)</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-a3"><span>Created <span class="term">.env.example</span> in the API repo</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-a4"><span><span class="term">.env</span> is in <span class="term">.gitignore</span></span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — frontend</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p4-b1"><span>Added a Ping client component with a button</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-b2"><span>File starts with <span class="term">'use client'</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p4-b3"><span>Click fetches the backend and displays the response</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-b4"><span>Loading and error states are implemented</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-b5"><span>API URL is read from <span class="term">NEXT_PUBLIC_API_URL</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p4-b6"><span>Created <span class="term">.env.example</span> in the web repo</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group both">
+      <h5>Together — the handshake</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p4-t1"><span>Watched the CORS error together in the Network tab</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-t2"><span>Watched the fixed request succeed together</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-t3"><span>Both PRs reviewed, approved, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p4-c1"><span>What CORS is, in one sentence</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-c2"><span>What a Promise is and its three states</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-c3"><span>What async/await does</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-c4"><span>Why <span class="term">.json()</span> is also awaited</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-c5"><span>What <span class="term">'use client'</span> does and when it's required</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-c6"><span>Which env vars in Next.js are public vs server-only</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p4-v1"><span>Click the Ping button → backend's health JSON appears on the page</span></label></li>
+        <li><label><input type="checkbox" data-key="p4-v2"><span>Stop the backend, click again — frontend shows a friendly error, not a white screen</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 5 ════════════════════════════════ -->
+<section class="phase" id="phase-5">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 5</span>
+    <span class="badge both">Pair · Backend-heavy</span>
+    <h2>Memory — The Database</h2>
+    <p class="phase-meta">Goal: Postgres runs locally, a Link table exists, queryable from NestJS via Prisma. Both devs participate.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    Until now, nothing has been saved. Restart the server, data is gone. A
+    database fixes that. Both devs sit together on this one — every full-stack
+    developer needs to read a schema and run a migration without panic.
+  </p>
+
+  <div class="callout concept">
+    <h4>What is a database?</h4>
+    <p>
+      A program whose only job is to store data and answer questions about it
+      reliably. It survives restarts, handles concurrent users, and gives you
+      a query language.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>SQL vs NoSQL — one sentence each</h4>
+    <p>
+      <strong>SQL (relational)</strong>: data lives in tables with a strict
+      schema; rows can reference each other by ID. PostgreSQL, MySQL.
+      <strong>NoSQL</strong>: looser shape, often tuned for one access pattern.
+      MongoDB, Redis. For your canonical Link table, relational is the right
+      choice.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Schema. Primary key. Unique constraint.</h4>
+    <p>
+      A <strong>schema</strong> describes the shape of your tables. A
+      <strong>primary key</strong> uniquely identifies a row — usually a
+      number or a UUID. A <strong>unique constraint</strong> on a column
+      enforces that no two rows share a value there (your slug column needs
+      this).
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is an ORM? Why Prisma?</h4>
+    <p>
+      An <strong>ORM</strong> (Object-Relational Mapper) lets you read/write
+      the database with typed objects instead of raw SQL strings.
+      <strong>Prisma</strong> is the most beginner-friendly choice for
+      TypeScript projects: you write a schema file, Prisma generates a typed
+      client and the migration files.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a migration?</h4>
+    <p>
+      A version-controlled change to your database schema. Add a column → write
+      a migration. Migrations are committed to Git so every dev (and
+      production) replays them in the same order. <strong>Never edit a
+      migration that's been merged.</strong> Add a new one instead.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a connection string?</h4>
+    <p>
+      A single URL-like string that tells your app how to reach the DB:
+      <span class="term">postgres://user:password@host:port/dbname</span>.
+      It lives in <span class="term">.env</span>, never in Git.
+    </p>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair tasks — both pairing throughout</h4>
+    <ol>
+      <li>Run Postgres locally. Easiest: a Docker container. Native install is fine on Linux.</li>
+      <li>Install Prisma in the API repo.</li>
+      <li>Together, design the <span class="term">Link</span> model on paper first: id (auto), slug (unique string), originalUrl (string), createdAt (timestamp). Discuss every column out loud.</li>
+      <li>Write the Prisma schema file. Run the first migration. Confirm the table exists with a GUI like TablePlus or DBeaver, or via <span class="term">psql</span>.</li>
+      <li>Wire a <span class="term">PrismaService</span> into NestJS so other modules can use it.</li>
+      <li>Commit the migration AND the schema file.</li>
+    </ol>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Search "Prisma NestJS recipe" — the official guide saves an hour.</li>
+      <li>Schema first, queries later. Design names you'd be happy seeing in a year.</li>
+      <li>"Why isn't the slug column the primary key?" Good question — think about whether you might change a slug later. Auto-increment IDs are stable identifiers <em>internally</em>; slugs are stable <em>for the world</em>.</li>
+      <li>Use <span class="term">npx prisma studio</span> to browse the DB visually. Wonderful tool for beginners.</li>
+    </ul>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Connection string typos silently fail. Triple-check user, password, host, port, dbname.</li>
+      <li>Editing a merged migration. Don't. Add a new migration.</li>
+      <li>Docker on Linux exposes ports differently than on Mac/Windows. If the API can't reach the DB, check host/port and platform docs.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 5 Checkpoints</h4>
+
+    <div class="checkpoint-group both">
+      <h5>Together — DB up and queryable</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p5-1"><span>Postgres runs locally (Docker or native)</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-2"><span>Prisma is installed in the API project</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-3"><span><span class="term">Link</span> schema defined: id, slug (unique), originalUrl, createdAt</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-4"><span>First migration created and applied locally</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-5"><span>The Link table is visible in a GUI or via psql</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-6"><span>Inserted a test row manually via Prisma Studio</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-7"><span>A <span class="term">PrismaService</span> is registered in NestJS and can be injected</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-8"><span><span class="term">DATABASE_URL</span> lives in <span class="term">.env</span> (not committed) AND in <span class="term">.env.example</span> (committed)</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-9"><span>README has a "Database setup" section explaining how to run Postgres + apply migrations</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-10"><span>PR opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p5-c1"><span>What a schema is</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-c2"><span>What a migration is and why you don't edit merged ones</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-c3"><span>What a primary key and a unique constraint do</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-c4"><span>What an ORM gives you over raw SQL</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-c5"><span>Why <span class="term">.env</span> is never committed</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p5-v1"><span>You can stop the API, restart it, and the row you inserted is still there</span></label></li>
+        <li><label><input type="checkbox" data-key="p5-v2"><span>Both devs ran the migration on their machine and got the same table</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 6 ════════════════════════════════ -->
+<section class="phase" id="phase-6">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 6</span>
+    <span class="badge dev-a">Dev A · POST /links</span>
+    <span class="badge dev-b">Dev B · create form</span>
+    <h2>Shorten a Link — The Create Flow</h2>
+    <p class="phase-meta">Goal: paste a URL → click submit → get a working short link. Dev A writes the backend, Dev B writes the frontend, both touch the contract.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    This is your first end-to-end feature. Treat it as a small product. Lock
+    the API contract first, work in parallel, integrate at the end.
+  </p>
+
+  <div class="callout concept">
+    <h4>What is a DTO and why create one?</h4>
+    <p>
+      <strong>DTO</strong> = Data Transfer Object. A class describing the exact
+      shape of data crossing a boundary — here, the request body coming from
+      the frontend. Three reasons to bother instead of accepting raw bodies:
+    </p>
+    <ol>
+      <li><strong>Validation.</strong> Attach rules ("this must be a URL", "max length 2048") and reject bad input before it touches your service.</li>
+      <li><strong>Documentation.</strong> A new developer reads the DTO and knows what to send.</li>
+      <li><strong>Safety.</strong> If the client sends extra fields like <span class="term">isAdmin: true</span>, the DTO simply ignores them.</li>
+    </ol>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is validation?</h4>
+    <p>
+      Checking that incoming data has the shape and content you expect. NestJS
+      pairs with the <span class="term">class-validator</span> library so you
+      annotate DTO fields with decorators like <span class="term">@IsUrl()</span>,
+      <span class="term">@MaxLength(2048)</span>, <span class="term">@IsOptional()</span>.
+      A global "validation pipe" then enforces them on every request — garbage
+      in becomes 400 Bad Request, never an unhandled crash.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is dependency injection? (NestJS)</h4>
+    <p>
+      Instead of a controller doing <span class="term">new LinksService()</span>,
+      NestJS hands one in via the constructor. The framework creates and
+      caches the right instances. Why care? Testing becomes trivial (you swap
+      in fakes); pieces are wired loosely rather than tightly.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Body vs path parameter vs query parameter</h4>
+    <ul>
+      <li><strong>Body</strong> — the payload of a POST/PUT/PATCH. Big, structured. <span class="term">{ originalUrl: "..." }</span>.</li>
+      <li><strong>Path parameter</strong> — a slot in the URL itself. <span class="term">GET /links/:slug</span> — <span class="term">slug</span> is a path param.</li>
+      <li><strong>Query parameter</strong> — appended after <span class="term">?</span>. <span class="term">GET /links?page=2&amp;limit=20</span>. For filtering, paging, optional flags.</li>
+    </ul>
+    <p>In NestJS: <span class="term">@Body()</span>, <span class="term">@Param()</span>, <span class="term">@Query()</span>.</p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a controlled input? (React)</h4>
+    <p>
+      The input's value lives in component state. When the user types, an
+      <span class="term">onChange</span> handler updates state; React re-renders
+      with the new value. "Controlled" because React, not the browser, owns
+      the source of truth.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is <span class="term">useState</span>?</h4>
+    <p>
+      A React hook — a function call you put at the top of a client component
+      to remember a value between renders. Returns the current value and a
+      setter. Call the setter, the component re-renders with the new value.
+      That's the entire mental model.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Why <span class="term">event.preventDefault()</span>?</h4>
+    <p>
+      When a form is submitted, the browser's default behavior is to reload
+      the page with the form data in the URL. You don't want that. Call
+      <span class="term">event.preventDefault()</span> at the top of your
+      submit handler to stop it.
+    </p>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair sync — lock the contract before coding</h4>
+    <p>Sit together for 10 minutes and agree:</p>
+    <ul>
+      <li>Request: <span class="term">POST /links</span>, body <span class="term">{ originalUrl: string }</span>.</li>
+      <li>Success: 201 with <span class="term">{ slug, originalUrl, shortUrl, createdAt }</span>. (Decide: is <span class="term">shortUrl</span> built on the server or composed on the frontend? Either is fine; pick one.)</li>
+      <li>Error: 400 with <span class="term">{ statusCode, message }</span>.</li>
+    </ul>
+    <p>Write it in <span class="term">docs/api.md</span>. Then split.</p>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-a">
+      <h4>Dev A — Backend POST /links <span class="stack-tag">be</span></h4>
+      <ul>
+        <li>Define <span class="term">CreateLinkDto</span> with one field: <span class="term">originalUrl</span>. Add <span class="term">@IsUrl()</span> and a sensible <span class="term">@MaxLength()</span>.</li>
+        <li>Enable the global ValidationPipe so DTOs are enforced everywhere.</li>
+        <li>In the service, generate a short, URL-safe slug. Don't write your own random generator — there's a tiny well-known library starting with "n" that does it correctly.</li>
+        <li>Save to DB. On a (very rare) slug collision, retry.</li>
+        <li>Return the created link with status 201.</li>
+        <li>Test with curl and Insomnia: valid URL, invalid URL, empty body, missing field. Each succeeds or fails clearly.</li>
+        <li>Branch: <span class="term">feat/create-link-endpoint</span>.</li>
+      </ul>
+    </div>
+    <div class="track dev-b">
+      <h4>Dev B — Frontend form + success view <span class="stack-tag">fe</span></h4>
+      <ul>
+        <li>Replace the homepage placeholder with a real form: a text input + a submit button.</li>
+        <li>Use <span class="term">useState</span> for the input value, and separate state for loading + result + error.</li>
+        <li>On submit: call <span class="term">event.preventDefault()</span>, POST to <span class="term">/links</span>, handle three states.</li>
+        <li>Success view: show the short URL prominently with a "Copy" button that uses <span class="term">navigator.clipboard.writeText</span>.</li>
+        <li>Error view: friendly message.</li>
+        <li>Branch: <span class="term">feat/create-link-form</span>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Forgetting the ValidationPipe — your DTO decorators run silently and enforce nothing.</li>
+      <li>Returning the raw Prisma object including fields you didn't mean to expose. Pick your response shape consciously.</li>
+      <li>Not calling <span class="term">event.preventDefault()</span> → page reloads → loading state never finishes.</li>
+      <li>Hardcoding the API URL again instead of using <span class="term">NEXT_PUBLIC_API_URL</span>.</li>
+    </ul>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Think about the unhappy paths first. What does the user see if their input isn't a URL? If the server is down? If the slug collides?</li>
+      <li>The slug library has "nano" in the name. Read its docs — the default ID length is overkill for a URL shortener; look up how to shorten it.</li>
+      <li>Save your Insomnia collection and commit it to <span class="term">docs/</span>. Future-you will love past-you.</li>
+      <li>The success state is your moment to delight — pulse animation, big selectable URL, a checkmark when copied. Spend 10 extra minutes here.</li>
+    </ul>
+  </div>
+
+  <div class="callout stretch">
+    <h4>Stretch — when the basics work</h4>
+    <ul>
+      <li>Let users propose a custom slug. Validate (alphanumeric, length) and return 409 Conflict if taken.</li>
+      <li>Add an <span class="term">expiresAt</span> column you'll honour in Phase 7.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 6 Checkpoints</h4>
+
+    <div class="checkpoint-group both">
+      <h5>Together — contract locked first</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p6-t1"><span>Agreed on request body shape</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-t2"><span>Agreed on response shape and where <span class="term">shortUrl</span> is composed</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-t3"><span>Updated <span class="term">docs/api.md</span> in both repos</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — backend</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p6-a1"><span>Created <span class="term">CreateLinkDto</span> with validation decorators</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-a2"><span>Enabled global ValidationPipe</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-a3"><span>Service generates a unique slug using a tested library</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-a4"><span>Slug collisions are retried (handled gracefully)</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-a5"><span>POST /links saves to DB and returns 201 with the new link</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-a6"><span>Invalid URL → 400 with a clear message</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-a7"><span>Empty body → 400 with a clear message</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-a8"><span>Tested with curl AND Insomnia/Postman</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-a9"><span>PR opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — frontend</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p6-b1"><span>Real form on the homepage (input + submit)</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b2"><span>Input is controlled via <span class="term">useState</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b3"><span>Separate state for loading, result, error</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b4"><span>Submit handler calls <span class="term">event.preventDefault()</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b5"><span>POST request sends the body in JSON with the right content-type</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b6"><span>Loading state visible while waiting</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b7"><span>Success view shows the short URL prominently</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b8"><span>Copy button uses <span class="term">navigator.clipboard.writeText</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b9"><span>Error state shows a friendly message</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-b10"><span>PR opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p6-c1"><span>What a DTO is and at least two reasons we use one</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-c2"><span>What dependency injection is and one benefit</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-c3"><span>The difference between body, path param, and query param</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-c4"><span>What a controlled input is</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-c5"><span>Why <span class="term">event.preventDefault()</span> is needed in form submit handlers</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works end-to-end</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p6-v1"><span>Paste a valid URL → see a short URL appear</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-v2"><span>Paste "hello" (not a URL) → see a friendly error, not a crash</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-v3"><span>Submit empty form → see a friendly error</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-v4"><span>Click Copy → URL is on your clipboard (paste somewhere to confirm)</span></label></li>
+        <li><label><input type="checkbox" data-key="p6-v5"><span>The link appears in the Prisma Studio table after creation</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 7 ════════════════════════════════ -->
+<section class="phase" id="phase-7">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 7</span>
+    <span class="badge dev-b">Dev B · GET /:slug (be)</span>
+    <span class="badge dev-a">Dev A · 404 + success (fe)</span>
+    <h2>Use a Link — The Redirect Flow</h2>
+    <p class="phase-meta">Goal: visit a short URL → get redirected. <strong>The devs swap stacks this phase</strong>: Dev B writes the backend redirect, Dev A writes Next.js frontend pieces.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    The second half of the product. Crucially, the devs <em>swap</em> primary
+    stacks here. Dev B writes their first backend endpoint. Dev A writes their
+    first Next.js page-with-real-thinking. Both feel uncomfortable. Both grow.
+  </p>
+
+  <div class="callout concept">
+    <h4>What is a path parameter? (NestJS)</h4>
+    <p>
+      A variable piece of a URL. In <span class="term">/abc123</span>, the
+      <span class="term">abc123</span> is a path param. Declare with
+      <span class="term">@Get(':slug')</span>; read with
+      <span class="term">@Param('slug') slug: string</span>.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>301 vs 302 — which redirect to use?</h4>
+    <p>
+      <strong>301 Moved Permanently</strong>: browsers and search engines may
+      cache the redirect and never call you again. Great for "this URL moved
+      forever."<br />
+      <strong>302 Found (temporary)</strong>: browsers call you every time.
+      Great for URL shorteners — you want every click to flow through, both to
+      count it and to support changing destinations later.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>How does NestJS send a redirect?</h4>
+    <p>
+      Two paths: use the <span class="term">@Redirect()</span> decorator, or
+      grab the response object via <span class="term">@Res()</span> and call
+      its <span class="term">redirect()</span> method. The decorator is
+      simpler; the response-object route gives more control. Pick one,
+      understand the trade-off.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4><span class="term">not-found.tsx</span> in Next.js</h4>
+    <p>
+      The App Router has a special file convention: if a folder contains a
+      <span class="term">not-found.tsx</span>, it renders whenever a child
+      route calls <span class="term">notFound()</span> or a path doesn't match.
+      You also place one at the root of <span class="term">app/</span> as a
+      site-wide 404.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Next.js <span class="term">&lt;Link&gt;</span> vs anchor <span class="term">&lt;a&gt;</span></h4>
+    <p>
+      Use <span class="term">&lt;Link href="/about"&gt;</span> for internal
+      navigation between Next.js pages — it does client-side routing without a
+      full reload. For <em>external</em> URLs (or for your shortened link,
+      which is served by the API on a different host), a plain
+      <span class="term">&lt;a&gt;</span> tag is correct, often with
+      <span class="term">target="_blank"</span> and
+      <span class="term">rel="noopener noreferrer"</span>.
+    </p>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-b">
+      <h4>Dev B — Backend GET /:slug <span class="stack-tag">be</span></h4>
+      <ul>
+        <li>Create a new controller at the root prefix (separate from <span class="term">/links</span>). A <span class="term">RedirectController</span> handling <span class="term">GET /:slug</span> is clean.</li>
+        <li>Look up the slug via the Prisma service. If found, send a 302 to <span class="term">originalUrl</span>. If not, throw <span class="term">NotFoundException</span> (NestJS handles it as 404).</li>
+        <li>Test with the browser AND <span class="term">curl -I</span> (just the headers) to confirm the 302 + Location.</li>
+        <li>Reserve common paths — <span class="term">links</span>, <span class="term">version</span>, your <span class="term">health</span> route — so a user-generated slug can't collide with an API route. Discuss with Dev A.</li>
+      </ul>
+    </div>
+    <div class="track dev-a">
+      <h4>Dev A — Frontend not-found + success enhancements <span class="stack-tag">fe</span></h4>
+      <ul>
+        <li>Create <span class="term">app/not-found.tsx</span> in the web repo. A friendly "Link not found" page with a button back home.</li>
+        <li>On the homepage's success view from Phase 6, make the short URL a real, clickable <span class="term">&lt;a&gt;</span> tag with <span class="term">target="_blank"</span> and <span class="term">rel="noopener noreferrer"</span>.</li>
+        <li>Add a small "Open in new tab" button as well for accessibility.</li>
+        <li>Pair lightly with Dev B for 30 minutes — read their controller, ask one question about how 302s work.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair time — test the round trip</h4>
+    <p>
+      Together: create a link → click the short URL → land on the original
+      site. Then visit a fake slug → see the 404 path. Then test in incognito
+      to confirm cookies aren't doing anything weird. Then run
+      <span class="term">curl -I http://localhost:3001/abc123</span> and read
+      the response headers out loud.
+    </p>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Defaulting to 301 by accident — browsers will cache it and your future fixes won't appear in their browser until you change the path or they clear cache.</li>
+      <li>Slugs colliding with API routes. If <span class="term">/links</span> is a real route, a user can't have slug <span class="term">links</span>. Decide your policy.</li>
+      <li>Calling Next.js <span class="term">&lt;Link&gt;</span> with an external URL — it'll do client-side routing and break.</li>
+      <li>Open-redirect security: anyone can submit any URL. For V1 that's the product — but understand the risk.</li>
+    </ul>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>The <span class="term">curl -I</span> flag fetches just headers — perfect for inspecting redirects without following them.</li>
+      <li>Use <span class="term">curl -L</span> to follow redirects manually and see the full chain.</li>
+      <li>In <span class="term">not-found.tsx</span>, you can include an <span class="term">Image</span> — Next.js optimizes images automatically.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 7 Checkpoints</h4>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — backend (your first endpoint!)</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p7-b1"><span>Created a RedirectController for <span class="term">GET /:slug</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p7-b2"><span>Endpoint reads the slug as a path parameter</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-b3"><span>Service looks up the slug via Prisma</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-b4"><span>Found → returns 302 with the original URL in <span class="term">Location</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p7-b5"><span>Not found → throws <span class="term">NotFoundException</span> (404)</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-b6"><span>Verified the 302 with <span class="term">curl -I</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p7-b7"><span>Reserved system paths don't collide with user slugs (documented)</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-b8"><span>PR opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — frontend (not-found + success enhancements)</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p7-a1"><span>Created <span class="term">app/not-found.tsx</span> with a friendly message</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-a2"><span>404 page has a button/Link back to home</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-a3"><span>Success view's short URL is a real clickable anchor tag</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-a4"><span>Anchor uses <span class="term">target="_blank"</span> and <span class="term">rel="noopener noreferrer"</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p7-a5"><span>Considered: when is <span class="term">&lt;Link&gt;</span> vs <span class="term">&lt;a&gt;</span> right? (documented in a code comment or PR)</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-a6"><span>PR opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p7-c1"><span>What a path parameter is and how to read one in NestJS</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-c2"><span>When you'd choose 301 vs 302</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-c3"><span>What <span class="term">not-found.tsx</span> does in Next.js</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-c4"><span>When to use Next.js <span class="term">&lt;Link&gt;</span> vs a plain anchor</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p7-v1"><span>Created a short link → clicking it lands on the original site</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-v2"><span>Visiting a fake slug returns a clear 404</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-v3"><span><span class="term">curl -I &lt;short-url&gt;</span> shows status 302 and a Location header</span></label></li>
+        <li><label><input type="checkbox" data-key="p7-v4"><span>Tested in an incognito window — still works</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 8 ════════════════════════════════ -->
+<section class="phase" id="phase-8">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 8</span>
+    <span class="badge dev-b">Dev B · Redis cache (be)</span>
+    <span class="badge dev-a">Dev A · dashboard layout (fe)</span>
+    <h2>Speed — Caching</h2>
+    <p class="phase-meta">Goal: hot redirects don't touch the database. Dev B continues backend work; Dev A starts the dashboard frontend in parallel.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    Your design diagram has a cache between the redirection service and the
+    database for a reason. Redirects are read-heavy: the same slug gets clicked
+    thousands of times. Querying Postgres each time is wasteful. Dev B wires
+    in Redis. Meanwhile, Dev A sketches the dashboard frontend that you'll
+    populate with real data in Phase 9.
+  </p>
+
+  <div class="callout concept">
+    <h4>What is a cache?</h4>
+    <p>
+      A small, fast store that holds copies of frequently-asked-for data.
+      Reads from cache are orders of magnitude faster than reads from a
+      database on disk. The trade-off: a bit of freshness lost in exchange for
+      speed.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is Redis?</h4>
+    <p>
+      An in-memory key-value store. You SET a key to a value, GET it back by
+      key, optionally with a TTL. It does many other things, but for now
+      treat it as "a very fast dictionary that lives in another process."
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Cache-aside pattern</h4>
+    <p>
+      The pattern your design diagram shows. On a read:
+    </p>
+    <ol>
+      <li>Ask the cache by key.</li>
+      <li>Hit → return the value.</li>
+      <li>Miss → query the DB, store the result in the cache, then return.</li>
+    </ol>
+    <p>On writes/deletes, you must <em>invalidate</em> the cache to avoid
+    serving stale data. This is famously hard.</p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is TTL?</h4>
+    <p>
+      "Time to live." When you set a cache entry, you can attach an expiry —
+      after N seconds, the key is automatically deleted. TTLs are a safety
+      net: even if you forget to invalidate, wrong data won't live forever.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Graceful degradation</h4>
+    <p>
+      If Redis is down, your redirect should still work — just slower (fall
+      through to the DB). The cache is an accelerator, not a hard dependency.
+      Wrap calls in <span class="term">try/catch</span> so a cache failure
+      doesn't crash the request.
+    </p>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-b">
+      <h4>Dev B — Redis + cache-aside <span class="stack-tag">be</span></h4>
+      <ul>
+        <li>Run Redis locally (Docker one-liner).</li>
+        <li>Add a NestJS-friendly cache client. The official Cache Manager is fine for V1.</li>
+        <li>In the redirect service: check Redis first → on miss, query DB and SET with a TTL of ~1 hour.</li>
+        <li>Decide: populate the cache on link creation, or lazy on first read? Discuss the trade-off (and write it down).</li>
+        <li>Log "HIT" or "MISS" for every lookup so you can verify it's working.</li>
+        <li>Cache key naming: namespace it (e.g., <span class="term">link:abc123</span>) to leave room for future caches.</li>
+        <li>Make cache failures non-fatal — graceful degradation.</li>
+      </ul>
+    </div>
+    <div class="track dev-a">
+      <h4>Dev A — Dashboard layout <span class="stack-tag">fe</span></h4>
+      <ul>
+        <li>Create a new route at <span class="term">/dashboard</span> (folder + <span class="term">page.tsx</span>).</li>
+        <li>Build the table layout: columns for short URL, original URL, created date, click count (empty for now).</li>
+        <li>Hardcode 3–5 fake rows so the layout is real.</li>
+        <li>Design the empty state: a friendly message + link back to home to create one.</li>
+        <li>Add a header with a "Create new" button (or Link) back to home.</li>
+        <li>Style with Tailwind. Right-align numeric columns. Hover states on rows.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair exercise — prove the cache works</h4>
+    <p>
+      Together, hit the same redirect five times. Watch Dev B's logs: first
+      MISS, then four HITs. Then manually <em>update</em> the row in the DB
+      via Prisma Studio to point somewhere else. Hit the redirect again —
+      you'll still go to the old place until the TTL expires or you
+      invalidate. <em>This</em> is what people mean when they say "cache
+      invalidation is hard."
+    </p>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Caching the negative case (404 for unknown slugs) — pros (DDOS protection) and cons (a slug created seconds later still 404s). Pick a policy; document it.</li>
+      <li>Forgetting to invalidate on link updates/deletes. Stale data &gt; no data ≠ true; sometimes stale data is worse.</li>
+      <li>Treating Redis as a hard dependency. If Redis dies, your redirects should still work.</li>
+    </ul>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Read about <strong>cache stampede</strong>: what happens when 100 simultaneous requests all miss the cache for the same key? You don't need to solve it in V1, just understand the problem.</li>
+      <li>Long TTLs = more stale data. Short TTLs = more DB hits. Where's the sweet spot for short links? (Hint: links rarely change.)</li>
+      <li>Use the Redis CLI (<span class="term">redis-cli</span>) to inspect keys directly. <span class="term">KEYS *</span> lists everything; <span class="term">GET key</span> reads it.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 8 Checkpoints</h4>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — Redis cache</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p8-b1"><span>Redis runs locally and is documented in the README</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-b2"><span>NestJS cache module added and configured</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-b3"><span>Redirect path checks cache first</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-b4"><span>On miss, queries DB and populates cache with TTL</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-b5"><span>Cache keys are namespaced (e.g. <span class="term">link:abc123</span>)</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-b6"><span>HIT/MISS logged for verification</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-b7"><span>Cache failures don't crash the redirect (graceful degradation)</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-b8"><span>Negative-case caching policy decided and documented</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-b9"><span>PR opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — dashboard layout</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p8-a1"><span>Created <span class="term">/dashboard</span> route in Next.js</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-a2"><span>Table layout: short URL, original URL, created date, click count columns</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-a3"><span>3–5 hardcoded rows so the layout is real</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-a4"><span>Empty state designed and visually distinct</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-a5"><span>Header with "Create new" Link back to homepage</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-a6"><span>Numeric column right-aligned; rows have hover state</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-a7"><span>PR opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p8-c1"><span>The cache-aside pattern in one sentence</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-c2"><span>What TTL is and what it protects against</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-c3"><span>Why cache invalidation is hard</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-c4"><span>What graceful degradation means</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p8-v1"><span>First hit logs MISS, subsequent hits log HIT</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-v2"><span>Stop Redis → redirects still work (slower) without crashing</span></label></li>
+        <li><label><input type="checkbox" data-key="p8-v3"><span><span class="term">/dashboard</span> renders the table with placeholder rows</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 9 ════════════════════════════════ -->
+<section class="phase" id="phase-9">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 9</span>
+    <span class="badge dev-a">Dev A · GET /links + dashboard data</span>
+    <span class="badge dev-b">Dev B · click tracking + stats page</span>
+    <h2>Insights — Analytics &amp; Dashboard</h2>
+    <p class="phase-meta">Goal: every click is tracked; the dashboard shows real numbers. <strong>Each dev now writes BOTH backend AND frontend in this phase.</strong></p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    This is the phase where both devs do their fullest stack-spanning work.
+    Dev A writes a backend endpoint AND wires the dashboard frontend to it.
+    Dev B writes click-tracking on the backend AND a dynamic stats page on
+    the frontend. By the end of this phase, both of you have written real
+    NestJS endpoints and real Next.js pages.
+  </p>
+
+  <div class="callout concept">
+    <h4>Why a separate model for clicks?</h4>
+    <p>
+      A successful URL shortener might serve millions of redirects. Each is a
+      small write event with timestamp, user agent, maybe IP. They're written
+      far more often than they're read in aggregate. The design diagram puts
+      them in a document DB (e.g., MongoDB). For V1, a simple
+      <span class="term">Click</span> table in Postgres is perfectly fine —
+      it's a smaller cognitive load. Upgrade later if you ever need to.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Fire and forget / async writes</h4>
+    <p>
+      When someone clicks a short link, the redirect must be fast. Do not make
+      them wait while you write a click event. Trigger the write in the
+      background and don't <span class="term">await</span> it in the redirect
+      handler — but always attach a <span class="term">.catch()</span> so an
+      unhandled promise rejection doesn't crash your Node process.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is <span class="term">useEffect</span>?</h4>
+    <p>
+      A React hook that runs code <em>after</em> render — for things like data
+      fetching in client components, subscribing to something, or starting a
+      timer. It takes a function and a dependency array; the function reruns
+      when any value in the array changes. For data fetching in Next.js App
+      Router, you should usually prefer server components (no hook needed) and
+      reach for <span class="term">useEffect</span> only when something truly
+      client-side is going on (e.g., real-time updates).
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Server vs Client fetching in Next.js</h4>
+    <p>
+      A server component can <span class="term">await fetch(...)</span>
+      directly in its body during render. No <span class="term">useEffect</span>,
+      no loading flicker on initial load — the HTML arrives already populated.
+      Use a client component (<span class="term">'use client'</span> +
+      <span class="term">useEffect</span> or a library like SWR) only when
+      you need interactivity or live updates after mount.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Dynamic route segments (Next.js)</h4>
+    <p>
+      A folder named <span class="term">[slug]</span> in your <span class="term">app/</span>
+      tree captures any value in that segment. <span class="term">app/links/[slug]/page.tsx</span>
+      serves <span class="term">/links/abc123</span>, with <span class="term">slug = "abc123"</span>
+      available as a prop. This is how you build the per-link stats page.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Pagination — query parameters &amp; DTOs for them too</h4>
+    <p>
+      Once you have many links, you can't return them all. Use query params
+      like <span class="term">?page=1&amp;limit=20</span>. In NestJS, you can
+      validate query params with a DTO too — sane defaults, max limits.
+    </p>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair sync — contracts again</h4>
+    <p>Before splitting, agree on:</p>
+    <ul>
+      <li><span class="term">GET /links?page=1&amp;limit=20</span> response: <span class="term">{ items: Link[], total: number }</span> — each item includes a <span class="term">clickCount</span>.</li>
+      <li><span class="term">GET /links/:slug/stats?days=7</span> response: <span class="term">{ total: number, last7Days: number, byDay: [{ date, count }] }</span>.</li>
+    </ul>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-a">
+      <h4>Dev A — GET /links + wire dashboard <span class="stack-tag">be</span> <span class="stack-tag">fe</span></h4>
+      <ul>
+        <li><strong>Backend:</strong> Add <span class="term">GET /links</span> — returns the list of links with a <span class="term">clickCount</span> per row. Pagination via query params (with a small DTO for query validation).</li>
+        <li>Decide how the click count is computed (count from the Click table, or maintain a counter column). Document the trade-off.</li>
+        <li><strong>Frontend:</strong> Replace the hardcoded dashboard rows with a real fetch from your new endpoint.</li>
+        <li>Use a Next.js <strong>server component</strong> for the initial fetch (no <span class="term">useEffect</span> needed).</li>
+        <li>Empty state shows when no links exist; error state shows when API is down.</li>
+      </ul>
+    </div>
+    <div class="track dev-b">
+      <h4>Dev B — click tracking + stats page <span class="stack-tag">be</span> <span class="stack-tag">fe</span></h4>
+      <ul>
+        <li><strong>Backend:</strong> Add a <span class="term">Click</span> model in Prisma (link relation, createdAt, userAgent string). Migration.</li>
+        <li>On every successful redirect, record a click — <em>without</em> blocking the response. Attach a <span class="term">.catch()</span>.</li>
+        <li>Add <span class="term">GET /links/:slug/stats</span> with a small DTO for the <span class="term">?days=7</span> query param.</li>
+        <li><strong>Frontend:</strong> Create <span class="term">app/links/[slug]/page.tsx</span> — a server component that fetches the stats and displays them. Total clicks, last-N-days number, a simple list of daily counts.</li>
+        <li>Stretch: turn the daily list into a tiny SVG sparkline.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout pair">
+    <h4>V1 auth decision — write it down</h4>
+    <p>
+      The dashboard currently lists <em>everyone's</em> links. For V1, that's
+      fine — treat it as a public demo. Add auth in V2. Document this in
+      <span class="term">docs/decisions.md</span> so future-you remembers
+      why you skipped it.
+    </p>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Unhandled promise rejections in fire-and-forget code can crash Node. Always <span class="term">.catch()</span>.</li>
+      <li>Bots will hit your links and inflate counts. For V1 don't worry; V2 can add user-agent filtering.</li>
+      <li>A server component cannot use <span class="term">useState</span> or <span class="term">useEffect</span>. If you get a hook error, you forgot which kind of component you're in.</li>
+      <li>Computing click count on read (COUNT query) is simple but slow at scale. A counter column is faster but needs careful updates. Trade-off.</li>
+    </ul>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Prisma's <span class="term">_count</span> select trick can return click counts alongside links in a single query. Search for it.</li>
+      <li>Server-component fetching in Next.js: just write <span class="term">async function Page() { const data = await fetch(...) ... }</span> — no client hooks needed.</li>
+      <li>A simple sparkline is just an SVG with a polyline. ~20 lines of code if you want one.</li>
+      <li>Prefetching by browsers and link previews send extra GETs. Some hit your redirect. Note the implication for click counts.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 9 Checkpoints</h4>
+
+    <div class="checkpoint-group both">
+      <h5>Together — contracts agreed</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p9-t1"><span>Agreed response shape for <span class="term">GET /links</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p9-t2"><span>Agreed response shape for <span class="term">GET /links/:slug/stats</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p9-t3"><span>Auth decision documented in <span class="term">docs/decisions.md</span></span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — GET /links (be) + dashboard data (fe)</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p9-a1"><span><span class="term">GET /links</span> endpoint returns links with click counts</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-a2"><span>Query params for pagination (<span class="term">page</span>, <span class="term">limit</span>) with a DTO</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-a3"><span>Sensible defaults (e.g., page=1, limit=20)</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-a4"><span>Dashboard fetches from <span class="term">/links</span> in a server component</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-a5"><span>Empty state shows when there are zero links</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-a6"><span>Error state shows when the API is unreachable</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-a7"><span>Each row's slug links to <span class="term">/links/[slug]</span> (Dev B's stats page)</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-a8"><span>PRs opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — click tracking (be) + stats page (fe)</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p9-b1"><span>Added a <span class="term">Click</span> model and migration</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b2"><span>Successful redirects record a click event</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b3"><span>Write is fire-and-forget (does NOT delay the redirect)</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b4"><span>Promise rejections are caught — no unhandled crash possible</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b5"><span>Added <span class="term">GET /links/:slug/stats</span> endpoint</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b6"><span>Query DTO validates <span class="term">?days=</span> parameter</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b7"><span>Created dynamic route <span class="term">app/links/[slug]/page.tsx</span></span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b8"><span>Page fetches stats in a server component and renders them</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b9"><span>404 case handled — visiting <span class="term">/links/nonexistent</span> shows a not-found UI</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-b10"><span>PRs opened, reviewed, merged</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p9-c1"><span>What fire-and-forget means and why <span class="term">.catch()</span> matters</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-c2"><span>The difference between server-component fetching and client <span class="term">useEffect</span> fetching</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-c3"><span>What <span class="term">useEffect</span> does and when you actually need it</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-c4"><span>How dynamic routes work in Next.js (the <span class="term">[slug]</span> folder)</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-c5"><span>Trade-off: COUNT query vs maintained counter for click totals</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group verify">
+      <h5>Verify it works</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p9-v1"><span>Create a link → click it 3 times → dashboard shows click count of 3</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-v2"><span>Click a row in the dashboard → land on the per-link stats page</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-v3"><span>Click count and last-N-days numbers are correct</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-v4"><span>Visit a fake slug under <span class="term">/links/</span> → not-found UI shows</span></label></li>
+        <li><label><input type="checkbox" data-key="p9-v5"><span>Redirects are still fast — tracking doesn't add visible latency</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 10 ═══════════════════════════════ -->
+<section class="phase" id="phase-10">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 10</span>
+    <span class="badge both">Both — tests + CI</span>
+    <h2>Robustness — Errors, Tests, CI</h2>
+    <p class="phase-meta">Goal: catch your own bugs before users do. Each dev writes tests for their own endpoints and one E2E flow each.</p>
+  </div>
+
+  <h3>The big picture</h3>
+  <p>
+    You will not test everything. You will test what hurts most when it breaks
+    — the slug generator, the create endpoint contract, and the happy-path
+    end-to-end flow.
+  </p>
+
+  <div class="callout concept">
+    <h4>Three kinds of tests</h4>
+    <ul>
+      <li><strong>Unit test</strong> — one tiny function in isolation. Fast, narrow. (Slug generator, validation rules.)</li>
+      <li><strong>Integration test</strong> — several pieces together. (A controller + service + a real test database.)</li>
+      <li><strong>End-to-end (E2E) test</strong> — a real browser clicks through the app like a user. (Create a link, click it, see the redirect.)</li>
+    </ul>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is mocking?</h4>
+    <p>
+      Replacing a real dependency with a fake during a test. Useful when the
+      real thing is slow (network), nondeterministic (random IDs), or has side
+      effects (sending email). <strong>Don't mock your own database in
+      integration tests</strong> — use a real test DB. Mocks of your own code
+      tend to lie.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>CI — Continuous Integration</h4>
+    <p>
+      Automated checks that run on every PR — lint, type-check, tests. A red
+      check blocks merging. GitHub Actions runs these for free. Set it up
+      once, benefit forever.
+    </p>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-a">
+      <h4>Dev A — tests for your endpoints + dashboard E2E</h4>
+      <ul>
+        <li>Unit test for the slug generator: right length, only allowed characters, no duplicates in a batch of N.</li>
+        <li>Integration test for <span class="term">POST /links</span>: valid → 201, invalid URL → 400, empty body → 400, missing field → 400.</li>
+        <li>Integration test for <span class="term">GET /links</span>: returns the right shape, pagination respects limits.</li>
+        <li>Playwright E2E: open the homepage → paste a URL → submit → see the success view with a short URL.</li>
+        <li>Add a GitHub Actions workflow that runs lint + type-check + tests on every PR.</li>
+      </ul>
+    </div>
+    <div class="track dev-b">
+      <h4>Dev B — tests for redirect + cache + tracking + stats E2E</h4>
+      <ul>
+        <li>Integration test for <span class="term">GET /:slug</span>: known slug → 302 with the right Location; unknown → 404.</li>
+        <li>Test that a click is recorded when a redirect succeeds.</li>
+        <li>Test that a Redis outage doesn't break the redirect path (mock the cache to throw; expect a successful redirect).</li>
+        <li>Integration test for <span class="term">GET /links/:slug/stats</span>: shape and counts are correct.</li>
+        <li>Playwright E2E: open dashboard → click a row → see the stats page render.</li>
+        <li>Add a GitHub Actions workflow that runs lint + type-check + tests on every PR.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout git">
+    <h4>Git Moment — required checks &amp; protected branches</h4>
+    <p>
+      Once CI runs reliably, mark the checks "required" on
+      <span class="term">main</span>. PRs can no longer merge with a failing
+      build. (Settings → Branches → Protected branches.)
+    </p>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Don't test implementation details. Test behaviour: "given input X, response is Y." Rewrites of the implementation should not break the tests.</li>
+      <li>Flaky tests destroy trust. If a test flakes, fix it or delete it; don't tolerate it.</li>
+      <li>Add a CI badge to each README. Easy 10-minute win.</li>
+      <li>Use a per-run test database (Docker container that's reset before each run) to keep tests deterministic.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 10 Checkpoints</h4>
+
+    <div class="checkpoint-group both">
+      <h5>Together — CI + polish</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p10-t1"><span>GitHub Actions workflow file exists in both repos</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-t2"><span>CI runs lint, type-check, and tests on every PR</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-t3"><span><span class="term">main</span> branch is protected; required checks are enforced</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-t4"><span>README badges show CI status</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-t5"><span>Loading states added to every async surface in the frontend</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-t6"><span>Error boundary(ies) added in Next.js</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-t7"><span>Lighthouse audit run on home, dashboard, stats page; top issues fixed</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — tests</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p10-a1"><span>Unit test for slug generator passes</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-a2"><span>Integration tests for POST /links (4 scenarios) pass</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-a3"><span>Integration test for GET /links (shape + pagination) passes</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-a4"><span>Playwright E2E for create flow passes</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — tests</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p10-b1"><span>Integration test for GET /:slug (found + missing) passes</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-b2"><span>Test for click event being recorded on redirect passes</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-b3"><span>Test for Redis outage → redirect still works passes</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-b4"><span>Integration test for GET /links/:slug/stats passes</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-b5"><span>Playwright E2E for stats page passes</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p10-c1"><span>Difference between unit, integration, and E2E tests</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-c2"><span>When to mock and when not to</span></label></li>
+        <li><label><input type="checkbox" data-key="p10-c3"><span>What CI is and what required checks enforce</span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 11 ═══════════════════════════════ -->
+<section class="phase" id="phase-11">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 11</span>
+    <span class="badge dev-a">Dev A · deploy backend</span>
+    <span class="badge dev-b">Dev B · deploy frontend</span>
+    <h2>Ship It — Deployment</h2>
+    <p class="phase-meta">Goal: a public URL anyone in the world can paste into a browser and use.</p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is deployment?</h4>
+    <p>
+      Moving code from "runs on my laptop" to "runs on a computer somewhere
+      everyone on the internet can reach." A platform takes your repo, builds
+      it, runs it, and points a public URL at it. Push code → it redeploys.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>What is a PaaS?</h4>
+    <p>
+      Platform-as-a-Service. You give them a Git repo; they handle the
+      machines, the OS, the runtime. Vercel, Railway, Render, Fly are
+      examples. Saves beginners weeks of YAML and infrastructure.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Production env vars vs local</h4>
+    <p>
+      Your local <span class="term">.env</span> is local. In production, your
+      hosting platform has its own UI to set environment variables. Audit
+      every config used locally: DATABASE_URL, REDIS_URL, CORS_ORIGIN,
+      NEXT_PUBLIC_API_URL, NODE_ENV, JWT_SECRET if any. Set them all.
+    </p>
+  </div>
+
+  <div class="callout concept">
+    <h4>Secrets — and the <span class="term">NEXT_PUBLIC_</span> trap</h4>
+    <p>
+      Anything prefixed <span class="term">NEXT_PUBLIC_</span> in Next.js
+      ships to the browser. Never put secrets there. Anything else is
+      server-only and safe. A common leak: putting an API key in a
+      <span class="term">NEXT_PUBLIC_</span> var "just to make it work."
+      Don't.
+    </p>
+  </div>
+
+  <div class="tracks">
+    <div class="track dev-a">
+      <h4>Dev A — Deploy backend</h4>
+      <ul>
+        <li>Sign up for Railway or Render. Connect the API repo.</li>
+        <li>Provision a managed Postgres from the same dashboard. Set <span class="term">DATABASE_URL</span>.</li>
+        <li>Provision a managed Redis. Set <span class="term">REDIS_URL</span>.</li>
+        <li>Set every other env var. Set <span class="term">CORS_ORIGIN</span> to your eventual Vercel URL once Dev B has it.</li>
+        <li>Trigger the first deploy. Read the build logs end-to-end.</li>
+        <li>Run production migrations (<span class="term">prisma migrate deploy</span>).</li>
+        <li>Smoke test the deployed health endpoint.</li>
+      </ul>
+    </div>
+    <div class="track dev-b">
+      <h4>Dev B — Deploy frontend</h4>
+      <ul>
+        <li>Sign up for Vercel. Connect the web repo.</li>
+        <li>Set <span class="term">NEXT_PUBLIC_API_URL</span> to the deployed backend URL.</li>
+        <li>Deploy. Read the build logs.</li>
+        <li>Open the live site. Watch the Network tab; verify calls go to the prod backend, not localhost.</li>
+        <li>Once your URL is known, hand it to Dev A so they can update CORS.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout pair">
+    <h4>Pair time — first prod smoke test</h4>
+    <p>
+      Together, on the live site: create a link. Click it. Watch it redirect
+      to the real destination. Check the live dashboard for the click. If
+      anything goes wrong, look at the platform logs together. The first prod
+      incident is usually obvious once you look.
+    </p>
+  </div>
+
+  <div class="callout warn">
+    <h4>Gotchas</h4>
+    <ul>
+      <li>Hardcoded <span class="term">localhost</span> anywhere. <span class="kbd">grep -r localhost</span> both repos before deploying.</li>
+      <li>Forgetting to run production migrations. The DB exists but is empty of tables.</li>
+      <li>CORS lockout: prod frontend can't talk to prod backend because the allow-list still says <span class="term">localhost:3000</span>.</li>
+      <li>Secrets accidentally exposed via <span class="term">NEXT_PUBLIC_</span> vars. Audit before sharing the URL.</li>
+      <li>Free-tier limits — most PaaS spin down idle apps; the first hit can be slow. Document this so users don't think it's broken.</li>
+    </ul>
+  </div>
+
+  <div class="callout hint">
+    <h4>Hints</h4>
+    <ul>
+      <li>Most platforms give per-PR preview deployments. Wire them up — review becomes dramatically better.</li>
+      <li>Don't add a custom domain in V1. The platform URL is fine.</li>
+      <li>Add the live URL to the very top of both READMEs.</li>
+      <li>If a build fails, scroll the logs <em>up</em> from the error — the root cause is usually higher.</li>
+    </ul>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 11 Checkpoints</h4>
+
+    <div class="checkpoint-group dev-a">
+      <h5>Dev A — backend deployment</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p11-a1"><span>Signed up for Railway or Render and connected the API repo</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-a2"><span>Provisioned production Postgres; <span class="term">DATABASE_URL</span> set</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-a3"><span>Provisioned production Redis; <span class="term">REDIS_URL</span> set</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-a4"><span>All env vars set in production dashboard</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-a5"><span>Prisma migrations run successfully on production DB</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-a6"><span>Backend deploy succeeds (green build)</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-a7"><span>Live <span class="term">/links/health</span> endpoint returns JSON</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-a8"><span><span class="term">CORS_ORIGIN</span> updated to include Vercel URL (and preview URLs)</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group dev-b">
+      <h5>Dev B — frontend deployment</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p11-b1"><span>Signed up for Vercel and connected the web repo</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-b2"><span><span class="term">NEXT_PUBLIC_API_URL</span> set to deployed backend URL</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-b3"><span>Frontend deploy succeeds</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-b4"><span>Live site loads</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-b5"><span>Verified in Network tab that API calls go to prod backend</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-b6"><span>Shared Vercel URL with Dev A for CORS update</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group both">
+      <h5>Together — smoke test in prod</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p11-t1"><span>Created a link on the live site</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-t2"><span>Clicked the short URL and got redirected</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-t3"><span>Click count visible on live dashboard</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-t4"><span>Stats page renders correctly in prod</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-t5"><span>Shared live URL with 3 humans and watched them try it without your help</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-t6"><span>Both READMEs link to the live demo at the top</span></label></li>
+      </ul>
+    </div>
+
+    <div class="checkpoint-group concept-check">
+      <h5>Concepts you should be able to explain</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p11-c1"><span>What a PaaS is and the trade-off vs raw servers</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-c2"><span>Why <span class="term">NEXT_PUBLIC_</span> matters and what NOT to put there</span></label></li>
+        <li><label><input type="checkbox" data-key="p11-c3"><span>Why <span class="term">prisma migrate deploy</span> is different from <span class="term">migrate dev</span></span></label></li>
+      </ul>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PHASE 12 ═══════════════════════════════ -->
+<section class="phase" id="phase-12">
+  <div class="phase-header">
+    <span class="badge phase-badge">Phase 12</span>
+    <span class="badge both">Both — reflection</span>
+    <h2>Retrospective &amp; What's Next</h2>
+    <p class="phase-meta">Goal: name what you learned. Plan one V2 feature each.</p>
+  </div>
+
+  <h3>Sit down together. Answer these out loud.</h3>
+  <ol>
+    <li><strong>What's one concept</strong> you didn't understand at the start that you could now explain to someone else?</li>
+    <li><strong>What's one bug</strong> that took you longer than it should have, and what was the root cause?</li>
+    <li><strong>What part of the codebase</strong> are you proudest of? What part embarrasses you? (Both answers are correct.)</li>
+    <li><strong>Looking at the original Excalidraw design</strong>, what did you ship? What did you skip? Are the skipped parts still needed?</li>
+    <li><strong>Where did your partner save you?</strong> Tell them specifically.</li>
+    <li><strong>Which stack do you want more practice in</strong> — your "primary" or your "secondary"? Use that to plan V2.</li>
+  </ol>
+
+  <div class="callout stretch">
+    <h4>V2 ideas to pick from</h4>
+    <ul>
+      <li><strong>Auth.</strong> Email + magic link. Scope links to users. Now "my dashboard" actually means something.</li>
+      <li><strong>Custom slugs.</strong> Let users pick their own.</li>
+      <li><strong>Link expiration / pause.</strong> Add fields and check them on redirect.</li>
+      <li><strong>Better analytics.</strong> Referrer, device, country (free GeoIP DB).</li>
+      <li><strong>Custom domain.</strong> Buy a short domain, point it at your backend.</li>
+      <li><strong>Rate limiting.</strong> Stop someone creating 10,000 links per minute.</li>
+      <li><strong>Monorepo migration.</strong> Now that the two apps are stable, put them in one repo with shared types.</li>
+      <li><strong>Click events to MongoDB.</strong> Migrate from the Postgres Click table to MongoDB to match the original design.</li>
+    </ul>
+    <p>Each dev picks <em>one</em>. Write a short proposal (one page) before implementing. Practice the design step.</p>
+  </div>
+
+  <div class="callout hint">
+    <h4>One last hint</h4>
+    <p>
+      Save this repo. Pin it on your GitHub profile. Put the live URL in your
+      bio. Six months from now, you'll open it, cringe at week-one code,
+      improve something — and you'll know, viscerally, that you grew.
+    </p>
+  </div>
+
+  <div class="checkpoints">
+    <h4>✅ Phase 12 Checkpoints</h4>
+    <div class="checkpoint-group both">
+      <h5>The retro</h5>
+      <ul class="task-list">
+        <li><label><input type="checkbox" data-key="p12-1"><span>Both devs sat down (in person or video) for a real retro</span></label></li>
+        <li><label><input type="checkbox" data-key="p12-2"><span>Both answered all 6 reflection questions out loud</span></label></li>
+        <li><label><input type="checkbox" data-key="p12-3"><span>Compared what was built vs the original Excalidraw design</span></label></li>
+        <li><label><input type="checkbox" data-key="p12-4"><span>Each dev picked one V2 feature to lead</span></label></li>
+        <li><label><input type="checkbox" data-key="p12-5"><span>Each wrote a one-page V2 proposal</span></label></li>
+        <li><label><input type="checkbox" data-key="p12-6"><span>Both repos pinned on each dev's GitHub profile</span></label></li>
+        <li><label><input type="checkbox" data-key="p12-7"><span>Live demo URL added to GitHub bio (or portfolio)</span></label></li>
+        <li><label><input type="checkbox" data-key="p12-8"><span>Said a real thank you to each other</span></label></li>
+      </ul>
+    </div>
+    <div class="progress-bar"><div class="progress-fill"></div><span class="progress-text">0 / 0 complete · 0%</span></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════ APPENDICES ═══════════════════════════ -->
+
+<section class="appendix" id="git-cheatsheet">
+  <h2>Appendix A — Git &amp; GitHub Cheatsheet</h2>
+
+  <h3>Daily commands</h3>
+  <table>
+    <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="term">git status</span></td><td>Show what's changed and what's staged.</td></tr>
+      <tr><td><span class="term">git switch -c feat/foo</span></td><td>Create a new branch and move to it.</td></tr>
+      <tr><td><span class="term">git switch main</span></td><td>Move back to main.</td></tr>
+      <tr><td><span class="term">git add &lt;file&gt;</span></td><td>Stage one file. <span class="term">git add -p</span> stages chunks interactively.</td></tr>
+      <tr><td><span class="term">git commit -m "..."</span></td><td>Save staged changes.</td></tr>
+      <tr><td><span class="term">git push -u origin feat/foo</span></td><td>Push the branch and remember the upstream.</td></tr>
+      <tr><td><span class="term">git pull --rebase</span></td><td>Bring in remote changes by replaying yours on top — cleaner history.</td></tr>
+      <tr><td><span class="term">git log --oneline --graph</span></td><td>See the shape of the history.</td></tr>
+      <tr><td><span class="term">git diff</span></td><td>What's different from the last commit? (vs <span class="term">git diff --staged</span> for staged.)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Pull Request flow (rule for this project)</h3>
+  <ol>
+    <li>Never push to <span class="term">main</span> directly.</li>
+    <li>Branch from up-to-date <span class="term">main</span> with a name like <span class="term">feat/...</span>, <span class="term">fix/...</span>, <span class="term">chore/...</span>, <span class="term">docs/...</span>.</li>
+    <li>Commit small, commit often. Each commit message uses Conventional Commits: <em>feat: add link form</em>, <em>fix: handle slug collision</em>.</li>
+    <li>Push. Open a PR. Title is what changed; description is <em>why</em>.</li>
+    <li>The other dev reviews. Ask at least one question or leave at least one suggestion. Approve only after reading.</li>
+    <li>Squash and merge. Delete the branch.</li>
+  </ol>
+
+  <h3>Conflicts</h3>
+  <p>
+    When two branches change the same lines, Git asks you to choose. Affected
+    files contain <span class="term">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> markers.
+    Open them, pick which side wins (or merge by hand), remove the markers,
+    <span class="kbd">git add</span>, then continue with whatever Git's last
+    message suggested. Don't panic. Don't <span class="kbd">git reset --hard</span>
+    in a panic. Ask your partner.
+  </p>
+
+  <h3>Recovery</h3>
+  <ul>
+    <li><span class="term">git reflog</span> — your time machine for "I lost a branch." Almost nothing is truly lost in Git.</li>
+    <li><span class="term">git restore &lt;file&gt;</span> — undo unstaged changes to a file.</li>
+    <li><span class="term">git restore --staged &lt;file&gt;</span> — unstage a file you accidentally staged.</li>
+    <li><span class="term">git revert &lt;commit&gt;</span> — make a <em>new</em> commit that undoes an old one. Safe on shared branches.</li>
+  </ul>
+
+  <h3>Conventional Commits — a small style</h3>
+  <ul>
+    <li><span class="term">feat:</span> a new feature</li>
+    <li><span class="term">fix:</span> a bug fix</li>
+    <li><span class="term">chore:</span> tooling, config, deps</li>
+    <li><span class="term">docs:</span> documentation only</li>
+    <li><span class="term">refactor:</span> internal change, no user-visible effect</li>
+    <li><span class="term">test:</span> tests only</li>
+    <li><span class="term">style:</span> formatting only (no code logic)</li>
+  </ul>
+</section>
+
+<section class="appendix glossary" id="glossary">
+  <h2>Appendix B — Glossary</h2>
+  <dl>
+    <dt>API</dt>
+    <dd>The contract your backend exposes — which URLs it responds to and what they accept/return.</dd>
+
+    <dt>async / await</dt>
+    <dd>Syntax for Promises. <span class="term">await</span> pauses inside an <span class="term">async</span> function until the Promise settles.</dd>
+
+    <dt>Body / Path param / Query param</dt>
+    <dd>The three ways a client sends data with an HTTP request. Body = payload for POST/PUT. Path = slot in the URL. Query = after the <span class="term">?</span>.</dd>
+
+    <dt>Cache</dt>
+    <dd>A fast, temporary store holding copies of frequently-asked-for data.</dd>
+
+    <dt>Cache-aside</dt>
+    <dd>The pattern of "ask cache first, fall back to DB on miss, populate cache."</dd>
+
+    <dt>CI (Continuous Integration)</dt>
+    <dd>Automated checks (lint, type-check, tests) that run on every PR.</dd>
+
+    <dt>Client component (Next.js)</dt>
+    <dd>A React component that runs in the browser. Required for <span class="term">useState</span>, event handlers, browser APIs. Opt in with <span class="term">'use client'</span>.</dd>
+
+    <dt>Component</dt>
+    <dd>A reusable piece of UI — a function that returns JSX.</dd>
+
+    <dt>Controller (NestJS)</dt>
+    <dd>The class that maps HTTP requests to handler methods.</dd>
+
+    <dt>Conventional Commits</dt>
+    <dd>A style where commit messages start with a type: <span class="term">feat:</span>, <span class="term">fix:</span>, <span class="term">chore:</span>, etc.</dd>
+
+    <dt>CORS</dt>
+    <dd>The browser rule preventing one origin from calling another unless the server opts in.</dd>
+
+    <dt>Decorator</dt>
+    <dd>A function prefixed with <span class="term">@</span> that attaches metadata. Used heavily by NestJS.</dd>
+
+    <dt>Dependency Injection</dt>
+    <dd>Instead of constructing dependencies, you declare them in your constructor and the framework provides them.</dd>
+
+    <dt>DTO</dt>
+    <dd>Data Transfer Object. A class describing the shape of data at an API boundary, used for validation and clarity.</dd>
+
+    <dt>Environment variable</dt>
+    <dd>Config loaded from outside the code, typically from <span class="term">.env</span>. Keeps secrets out of Git.</dd>
+
+    <dt>ESLint</dt>
+    <dd>A linter — scans code for likely bugs and bad patterns.</dd>
+
+    <dt>Fetch</dt>
+    <dd>The browser's (and modern Node's) built-in function for HTTP requests.</dd>
+
+    <dt>Fire-and-forget</dt>
+    <dd>Triggering an async operation without awaiting it. Always attach <span class="term">.catch()</span>.</dd>
+
+    <dt>Framework vs Library</dt>
+    <dd>Library: you call it. Framework: it calls you. NestJS and Next.js are frameworks; lodash is a library.</dd>
+
+    <dt>Graceful degradation</dt>
+    <dd>The system keeps working (possibly more slowly) when a non-critical dependency fails.</dd>
+
+    <dt>HTTP</dt>
+    <dd>The protocol of the web. Methods (GET, POST), status codes (200, 404), headers, body.</dd>
+
+    <dt>JSX</dt>
+    <dd>HTML-like syntax inside JavaScript, used by React. A build step converts it to function calls.</dd>
+
+    <dt>Library — see <em>Framework vs Library</em></dt>
+    <dd>&nbsp;</dd>
+
+    <dt>Lockfile</dt>
+    <dd>Auto-generated file recording exact versions of every dependency for reproducible installs. Don't hand-edit.</dd>
+
+    <dt>Migration</dt>
+    <dd>A version-controlled change to your database schema.</dd>
+
+    <dt>Module (NestJS)</dt>
+    <dd>A bundle of related controllers and services declared as a unit.</dd>
+
+    <dt>not-found.tsx</dt>
+    <dd>Next.js convention for the 404 page in App Router.</dd>
+
+    <dt>ORM</dt>
+    <dd>Object-Relational Mapper. Lets you query the database via language objects instead of SQL strings.</dd>
+
+    <dt>PaaS</dt>
+    <dd>Platform-as-a-Service. Hosting where you give them a repo and they handle the rest.</dd>
+
+    <dt>package.json</dt>
+    <dd>Your project's manifest: name, scripts, dependencies.</dd>
+
+    <dt>Path parameter</dt>
+    <dd>A variable slot in a URL like <span class="term">/links/:slug</span>.</dd>
+
+    <dt>Port</dt>
+    <dd>A numbered slot a process listens on. <span class="term">:3000</span>, <span class="term">:5432</span>.</dd>
+
+    <dt>Prettier</dt>
+    <dd>A formatter that rewrites code in a consistent style.</dd>
+
+    <dt>Primary key</dt>
+    <dd>The unique identifier of a row in a database table.</dd>
+
+    <dt>Promise</dt>
+    <dd>A value that will exist later. Three states: pending, fulfilled, rejected.</dd>
+
+    <dt>Props (React)</dt>
+    <dd>Inputs a component receives from its parent. Read-only.</dd>
+
+    <dt>Pull Request (PR)</dt>
+    <dd>A proposal to merge a branch into another, with diff view, discussion, and review.</dd>
+
+    <dt>Query parameter</dt>
+    <dd>The part of a URL after the <span class="term">?</span>: filters, paging, options.</dd>
+
+    <dt>Redis</dt>
+    <dd>An in-memory key-value store, commonly used as a cache.</dd>
+
+    <dt>REST</dt>
+    <dd>An informal style for APIs based on resources and HTTP methods.</dd>
+
+    <dt>Server component (Next.js)</dt>
+    <dd>The default in App Router — renders on the server, ships no JS to the user.</dd>
+
+    <dt>Service (NestJS)</dt>
+    <dd>A class holding business logic, kept separate from the controller for testability.</dd>
+
+    <dt>Slug</dt>
+    <dd>A short, URL-safe identifier. In this project: the part after the domain that points to a long URL.</dd>
+
+    <dt>TTL</dt>
+    <dd>Time to live — how long a cache entry lives before it's auto-deleted.</dd>
+
+    <dt>TypeScript</dt>
+    <dd>JavaScript with a type system. Catches mistakes in the editor.</dd>
+
+    <dt>useEffect</dt>
+    <dd>A React hook that runs code after render — used for side effects in client components.</dd>
+
+    <dt>useState</dt>
+    <dd>The React hook that remembers a value between renders.</dd>
+
+    <dt>Validation</dt>
+    <dd>Checking incoming data against your expectations before processing it.</dd>
+  </dl>
+</section>
+
+<section class="appendix" id="stuck">
+  <h2>Appendix C — When You're Stuck</h2>
+
+  <h3>The 30-minute rule</h3>
+  <p>
+    If you've been stuck on the same problem for 30 minutes, you owe your
+    partner a question — or at least a written note in a GitHub Issue. Stuck
+    time multiplies fast when you're alone.
+  </p>
+
+  <h3>Stuck checklist</h3>
+  <ol>
+    <li><strong>Read the error message out loud.</strong> Every word. If you don't recognize one, search it.</li>
+    <li><strong>Did this work an hour ago?</strong> What's changed since? <span class="kbd">git diff</span> tells you.</li>
+    <li><strong>Is it a real bug or a config thing?</strong> Wrong env var? Wrong port? Stale build?</li>
+    <li><strong>Have you actually restarted the dev server?</strong> Sometimes you haven't, even though you swear you did.</li>
+    <li><strong>Reduce the problem.</strong> Strip everything irrelevant until the bug is in the smallest piece of code that still breaks.</li>
+    <li><strong>Search the exact error string</strong> in quotes. Someone else hit this. Probably last week.</li>
+    <li><strong>Rubber-duck it.</strong> Explain the problem out loud, in full sentences. Halfway through, you'll often see the answer.</li>
+    <li><strong>Ask your partner.</strong> A specific question with "what I tried" beats "help, it's broken."</li>
+  </ol>
+
+  <h3>Communication norms</h3>
+  <ul>
+    <li>Daily check-in: yesterday, today, blockers. 10 minutes max.</li>
+    <li>One shared to-do list: GitHub Issues, tagged by phase.</li>
+    <li>Disagree in writing on PRs, not in heated voice calls. Async gives both of you time to think.</li>
+    <li>Celebrate small wins. Phase 4 working is a real moment.</li>
+    <li>If a checkbox sits unticked for &gt; 2 days, that's a signal — talk about it.</li>
+  </ul>
+
+  <h3>What this plan deliberately leaves out (do NOT pre-build)</h3>
+  <ul>
+    <li><strong>Authentication.</strong> Add in V2. It's a whole project on its own.</li>
+    <li><strong>Microservices.</strong> The design diagram suggests separate services; for V1, run as a single NestJS app with multiple modules. Split later if you ever need to.</li>
+    <li><strong>Custom domains.</strong> Vercel and Railway URLs are fine to start.</li>
+    <li><strong>Rate limiting and abuse prevention.</strong> Worth adding once you have real traffic.</li>
+    <li><strong>Dockerfiles for production.</strong> Use platform-as-a-service first; Dockerfiles later.</li>
+    <li><strong>Monorepo tooling (Nx, Turborepo).</strong> Two repos is fine for V1.</li>
+  </ul>
+</section>
+
+<footer>
+  Plan v2 · Two-stack pair build · Iterate this plan as you learn — it's a Markdown commit away.
+</footer>
+
+<script>
+(function() {
+  const KEY = 'urlshortener-plan-progress-v2';
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}'); }
+    catch (e) { return {}; }
+  }
+  function saveState(state) { localStorage.setItem(KEY, JSON.stringify(state)); }
+
+  function updateAll() {
+    // Per-checkpoint-block progress
+    document.querySelectorAll('.checkpoints').forEach(block => {
+      const boxes = block.querySelectorAll('input[type="checkbox"][data-key]');
+      const total = boxes.length;
+      const done = Array.from(boxes).filter(b => b.checked).length;
+      const fill = block.querySelector('.progress-fill');
+      const txt  = block.querySelector('.progress-text');
+      const pct  = total ? Math.round((done/total)*100) : 0;
+      if (fill) fill.style.width = pct + '%';
+      if (txt)  txt.textContent = done + ' / ' + total + ' complete · ' + pct + '%';
+    });
+    // Overall
+    const all = document.querySelectorAll('input[type="checkbox"][data-key]');
+    const totalAll = all.length;
+    const doneAll = Array.from(all).filter(b => b.checked).length;
+    const pctAll = totalAll ? Math.round((doneAll/totalAll)*100) : 0;
+    const oFill = document.querySelector('.overall-fill');
+    const oTxt  = document.querySelector('.overall-text');
+    if (oFill) oFill.style.width = pctAll + '%';
+    if (oTxt)  oTxt.textContent = doneAll + ' / ' + totalAll + ' · ' + pctAll + '%';
+  }
+
+  function init() {
+    const state = loadState();
+    document.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb => {
+      const k = cb.dataset.key;
+      if (state[k]) {
+        cb.checked = true;
+        const li = cb.closest('li');
+        if (li) li.classList.add('completed');
+      }
+      cb.addEventListener('change', () => {
+        const li = cb.closest('li');
+        if (li) li.classList.toggle('completed', cb.checked);
+        const s = loadState();
+        s[cb.dataset.key] = cb.checked;
+        saveState(s);
+        updateAll();
+      });
+    });
+    updateAll();
+  }
+
+  window.resetProgress = function() {
+    if (!confirm('Clear all checkpoint progress on this device?')) return;
+    localStorage.removeItem(KEY);
+    document.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb => {
+      cb.checked = false;
+      const li = cb.closest('li');
+      if (li) li.classList.remove('completed');
+    });
+    updateAll();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
+</script>
+
+</body>
+</html>
